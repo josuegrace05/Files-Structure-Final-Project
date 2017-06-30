@@ -395,11 +395,10 @@ void ordeneIndice(INDICE *indiceArq, int n){
 
 }
 
-INDICE *criar_indices(){
+int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
 	
 	FILE *arq;
-	int cont = 0, contoffset = 0;// i;
-	INDICE *index = NULL;
+	int cont = 0, contoffset = 0, i;
 	char c, *cnpj;
 	
 	
@@ -413,12 +412,18 @@ INDICE *criar_indices(){
 			
 			fseek(arq,-1,SEEK_CUR);
 			
-			index = (INDICE*) realloc( index, sizeof(INDICE) * (cont+1) );
+			index1 = (INDICE*) realloc( index1, sizeof(INDICE) * (cont+1) );
+			index2 = (INDICE*) realloc( index2, sizeof(INDICE) * (cont+1) );
+			index3 = (INDICE*) realloc( index3, sizeof(INDICE) * (cont+1) );
 			cnpj = (char*) malloc ( sizeof(char) * 19); 
 			fread(cnpj, sizeof(char), 18, arq);
 			cnpj[18] = '\0';
-			index[cont].cnpj = cnpj;           
-			index[cont].offset = contoffset;           
+			index1[cont].cnpj = cnpj;           
+			index1[cont].offset = contoffset; 
+			index2[cont].cnpj = cnpj;           
+			index2[cont].offset = contoffset; 
+			index3[cont].cnpj = cnpj;           
+			index3[cont].offset = contoffset;           
 			cont++;	
 			
 			contoffset += 18;
@@ -432,12 +437,15 @@ INDICE *criar_indices(){
 			
 		}		
 		
-		ordeneIndice(index, cont);
-		/*for(i=0; i < cont; i++){
+		ordeneIndice(index1, cont);
+		ordeneIndice(index2, cont);
+		ordeneIndice(index3, cont);
+		
+		for(i=0; i < cont; i++){
 			
-			//printf("%s %d \n", index[i].cnpj, index[i].offset );
+			printf("%s %d \n", index1[i].cnpj, index1[i].offset);
 			
-		}*/
+		}
 	
 	
 	}else{
@@ -447,7 +455,7 @@ INDICE *criar_indices(){
 	
 	
 	
-	return index;
+	return 0;
 }
 
 

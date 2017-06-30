@@ -20,7 +20,7 @@
 int main(int argc, char *argv[]){
 
 	int op1 = 1; 
-	INDICE *index;													
+	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
 
 	while( op1 != 7){															
 		
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 			case 3:
 				
 				printf("caso3 criar indice\n");
-				index = criar_indices();
+				criar_indices(index1, index2, index3);
 				
 				
 			break;

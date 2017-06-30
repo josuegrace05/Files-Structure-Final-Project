@@ -16,6 +16,6 @@ int toUtf8(char *);
 int ler_arquivo_numfixreg();
 int listar_registros_numfixreg();
 
-INDICE *criar_indices();
+int criar_indices();
 
 #endif
