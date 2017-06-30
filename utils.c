@@ -84,7 +84,7 @@ int ler_arquivo_numfixreg(){
 	char *entrada;
 	char *cnpj, *dataregistro, *datacancelamento, *cnpjauditor, *nomesocial, *nomefantasia, *motivocancelamento, *nomeempresa;
 	char separador = '$', separador2 = '#';
-	int aux = 1, convert = 0, number = 0;
+	int aux = -1, convert = 0, number = 0;
 	
 	printf("\nDigite o nome do arquivo que deseja ler:\n");
 	entrada = readline(stdin);											// pede o nome do arquivo de onde irá ler (.csv)
@@ -103,6 +103,10 @@ int ler_arquivo_numfixreg(){
 	arq3 = fopen("file3.bin", "ab+");
 	
 	if(arq1 != NULL && arq2 != NULL && arq3 != NULL && arq_entrada != NULL){
+		
+		fwrite(&aux, sizeof(int), 1, arq1);
+		fwrite(&aux, sizeof(int), 1, arq2);								// escreve cabecalho
+		fwrite(&aux, sizeof(int), 1, arq3);
 		
 		while(fgetc(arq_entrada) != EOF){								// enquanto existirem registros
 			
@@ -272,33 +276,44 @@ void print_registro(FILE *arq){
 int listar_registros_numfixreg(){
 
 	FILE *arq;
-	int contador =  3, number = 0;
+	int contador =  3, number = 0, aux;
 	char enter;
 	
-	arq = fopen("file3.bin", "r");  
+	arq = fopen("file1.bin", "r");  
 	if(arq==NULL){												//verifica se o arquivo existe
 		printf("Arquivo Inexistente");
 		return -1;
 	}
 
+	fseek(arq,4,SEEK_CUR);
+	
 	while(fgetc(arq)!=EOF){
 											//Enquanto o arquivo não chegou ao seu final
 		fseek(arq,-1,SEEK_CUR);										//cursor = cursor - 1 para compensar o fgetc()
 		
-																	//um registro inteiro é printado na tela
-		if(contador-- > 0) {
-			printf("\nRegistro %d\n", number++);
-			print_registro(arq);	
-		}
-		else{
+		if( fgetc(arq) == '*'){
+			
+			printf("REMOVIDO\n");
+			fread(&aux, sizeof(int), 1, arq);
+			fseek(arq, aux - 6  ,SEEK_CUR);
+			
+		}else{
+				
+			fseek(arq,-1,SEEK_CUR);														//um registro inteiro é printado na tela
+			if(contador-- > 0) {
+				printf("\nRegistro %d\n", number++);
+				print_registro(arq);	
+			}
+			else{
 
-            printf("\nDigite enter para continuar ou 'q' para quitar\n");
-			scanf("%c", &enter);
-			if(enter == 'q')
-				break;
-			contador = 3;
+				printf("\nDigite enter para continuar ou 'q' para quitar\n");
+				scanf("%c", &enter);
+				if(enter == 'q')
+					break;
+				contador = 3;
 
-		}										
+			}	
+		}									
 	
 	}
 	fclose(arq);										
@@ -362,7 +377,7 @@ int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
 
 void removeIndex(INDICE *index, int *n, int pos){
 	int i;
-	//realizar a busca binária para saber qual a posição a ser removida
+	
 	free(index[pos].cnpj);
 
 	for(i = pos; i < (*n)-1; i++){
@@ -373,35 +388,40 @@ void removeIndex(INDICE *index, int *n, int pos){
 	index = (INDICE*) realloc(index, sizeof(INDICE) * (*n) );
 }
 
-int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
+int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3){
 	
 	FILE *arq;
-	int cont = 0, contoffset = 0;
+	int cont = 0, contoffset = 4;
 	char c, *cnpj;
 	
+	
+	if(*index1 != NULL || *index2 != NULL || *index3 != NULL ){
+		printf("Arquivo de indice já existente\n");
+		return 0;
+	}
 	
 	arq = fopen("file1.bin", "r");  
 	
 	if(arq!=NULL){														//verifica se o arquivo existe
 		
-		
+		fseek(arq,4,SEEK_CUR);
 		
 		while(fgetc(arq)!=EOF){
 			
 			fseek(arq,-1,SEEK_CUR);
 			
-			index1 = (INDICE*) realloc( index1, sizeof(INDICE) * (cont+1) );
-			index2 = (INDICE*) realloc( index2, sizeof(INDICE) * (cont+1) );
-			index3 = (INDICE*) realloc( index3, sizeof(INDICE) * (cont+1) );
+			*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (cont+1) );
+			*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (cont+1) );
+			*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (cont+1) );
 			cnpj = (char*) malloc ( sizeof(char) * 19); 
 			fread(cnpj, sizeof(char), 18, arq);
 			cnpj[18] = '\0';
-			index1[cont].cnpj = cnpj;           
-			index1[cont].offset = contoffset; 
-			index2[cont].cnpj = cnpj;           
-			index2[cont].offset = contoffset; 
-			index3[cont].cnpj = cnpj;           
-			index3[cont].offset = contoffset;           
+			(*index1)[cont].cnpj = cnpj;           
+			(*index1)[cont].offset = contoffset; 
+			(*index2)[cont].cnpj = cnpj;           
+			(*index2)[cont].offset = contoffset; 
+			(*index3)[cont].cnpj = cnpj;           
+			(*index3)[cont].offset = contoffset;           
 			cont++;	
 			
 			contoffset += 18;
@@ -415,16 +435,72 @@ int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
 			
 		}		
 		
-		ordeneIndice(index1, cont);
-		ordeneIndice(index2, cont);
-		ordeneIndice(index3, cont);
+		ordeneIndice(*index1, cont);
+		ordeneIndice(*index2, cont);
+		ordeneIndice(*index3, cont);
 
 	
 	}else{
 		printf("falha ao arir o arquivo");
 	}
 	
+	fclose(arq);
+	
 	return cont;
 
+}
+
+int print_indice(INDICE *index1, int tam){
+	
+	int i;
+	
+	for(i=0; i < tam; i++){
+			printf("%s %d\n", index1[i].cnpj, index1[i].offset); 
+	}
+	
+	return 0;
+}
+
+int remove_registro(char * cnpj, INDICE *index1, int *tam ){
+	
+	int pos, cont = 0, cabecalho = -1;
+	FILE *arq1;
+	char c = '*';
+	
+	pos = buscaBinaria(index1, 0, *tam, cnpj);
+	
+	arq1 = fopen("file1.bin", "r+");	
+	
+	fread(&cabecalho, sizeof(int), 1, arq1);
+							
+	printf("%d\n", index1[pos].offset);
+	fseek(arq1, index1[pos].offset , SEEK_SET);						// vai ate offset
+	printf("Aqui : %c\n", fgetc(arq1));
+	fseek(arq1,-1,SEEK_CUR);
+	
+	fwrite(&c, sizeof(char), 1, arq1);								// escreve *
+	
+	while(c != '#'){												// le até #
+		cont++;
+		c = fgetc(arq1);
+		printf("%c", c);
+	}
+	
+	fseek(arq1,-cont,SEEK_CUR);										// volta para frente do *
+	
+	cont += 2;														//marca tamanho
+	
+	fwrite(&cont, sizeof(int), 1, arq1);							//escreve o tamanho
+	
+	fwrite(&cabecalho, sizeof(int), 1, arq1);						// escreve cabecalho
+	
+	fseek(arq1, 0, SEEK_SET);										// volta pro cabecalho
+	
+	
+	fwrite(&index1[pos].offset, sizeof(int), 1, arq1);				// escreve a pos offset
+	
+	removeIndex(index1, tam, pos);
+	
+	return 0;
 }
 

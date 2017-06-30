@@ -21,6 +21,7 @@ int main(int argc, char *argv[]){
 
 	int op1 = 1, tam1, tam2, tam3; 
 	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
+	char *cnpj;
 
 	while( op1 != 8){															
 		
@@ -45,13 +46,17 @@ int main(int argc, char *argv[]){
 			case 3:
 				
 				printf("caso3 criar indice\n");
-				tam1 = criar_indices(index1, index2, index3);
+				tam1 = criar_indices(&index1, &index2, &index3);
 				tam2 = tam1;
 				tam3 = tam2;
 				
 			break;
 				
 			case 4:
+				
+				printf("digite o cnpj\n");
+				cnpj = readline(stdin);
+				remove_registro( cnpj, index1, &tam1 );
 				
 				printf("caso4\n");
 				
@@ -72,6 +77,7 @@ int main(int argc, char *argv[]){
 			case 7:
 				
 				printf("caso7\n");
+				print_indice(index1, tam1);
 				
 			break;	
 			

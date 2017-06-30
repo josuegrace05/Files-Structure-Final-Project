@@ -14,10 +14,11 @@ int toUtf8(char *);
 int ler_arquivo_numfixreg();
 int listar_registros_numfixreg();
 
-int criar_indices();
+int criar_indices(INDICE **, INDICE **, INDICE **);
 void removeIndex(INDICE *, int *, int);
 int buscaBinaria(INDICE *, int, int, char *);
 
-
+int remove_registro(char * cnpj, INDICE *index1, int *tam );
+int print_indice(INDICE *index1, int tam);
 
 #endif
