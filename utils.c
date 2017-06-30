@@ -395,6 +395,23 @@ void ordeneIndice(INDICE *indiceArq, int n){
 
 }
 
+int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
+
+	int middle = (start + end)/2;
+
+	if(start > end)
+		return -1;
+
+	if(strcmp(indexArq[middle].cnpj, key) == 0)
+		return middle;
+
+	else if(strcmp(indexArq[middle].cnpj, key) < 0)
+		return buscaBinaria(indexArq, middle +1 , end, key);
+
+	else 
+		return buscaBinaria(indexArq, start, middle -1, key);
+}
+
 INDICE *criar_indices(){
 	
 	FILE *arq;
@@ -433,6 +450,7 @@ INDICE *criar_indices(){
 		}		
 		
 		ordeneIndice(index, cont);
+		printf("POS :%d\n", buscaBinaria(index, 0, cont, "96.832.365/0001-51"));
 		/*for(i=0; i < cont; i++){
 			
 			//printf("%s %d \n", index[i].cnpj, index[i].offset );
@@ -444,10 +462,7 @@ INDICE *criar_indices(){
 		printf("falha ao arir o arquivo");
 	}
 	
-	
-	
-	
+		
 	return index;
 }
-
 
