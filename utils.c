@@ -55,9 +55,9 @@ int chooseOrganization(){
     int opt;
         printf("=====================================================\n");               // apresenta o menu de escolha de arquivo de saida
         printf("=                      MENU PRINCIPAL               =\n");
-        printf("=       1. Registros com indicador de tamnaho       =\n");
-        printf("=       2. registros com separador                  =\n");
-        printf("=       3. Registros com número fixo de campos      =\n");
+        printf("=       1. Criar os arquivos                        =\n");
+        printf("=       2. Exibir um arquivo                        =\n");
+        printf("=       3. Criar arquivo de índice                  =\n");
         printf("=       4. Finalizar programa                       =\n");
         printf("=====================================================\n\n");
 
@@ -350,6 +350,51 @@ int listar_registros_numfixreg(){
 	return 0;
 }
 
+void swap(INDICE *vector, int i, int j) {
+	INDICE aux = vector[i];
+	vector[i] = vector[j];
+	vector[j] = aux;
+}
+
+int partition(INDICE *vector, int left, int right) {
+	int i, j;
+
+	i = left;
+	for (j = i+1; j <= right; j++) {
+		if (strcmp(vector[j].cnpj, vector[left].cnpj) < 0) {
+			++i;
+			swap(vector, i, j);
+		}
+	}
+	swap(vector, i, left);
+
+	return i;
+}
+
+void quicksort(INDICE *vector, int left, int right) {
+	int r;
+
+	if (left < right) {
+		r = partition(vector, left, right);
+		quicksort(vector, left, r-1);
+		quicksort(vector, r+1, right);
+	}
+}
+
+
+void ordeneIndice(INDICE *indiceArq, int n){
+	int i;
+
+	quicksort(indiceArq, 0, n-1);
+
+	for(i=0; i < n; i++){
+			
+			printf("%s %d \n", indiceArq[i].cnpj, indiceArq[i].offset);
+			
+		}
+
+}
+
 INDICE *criar_indices(){
 	
 	FILE *arq;
@@ -387,7 +432,7 @@ INDICE *criar_indices(){
 			
 		}		
 		
-		
+		ordeneIndice(index, cont);
 		/*for(i=0; i < cont; i++){
 			
 			//printf("%s %d \n", index[i].cnpj, index[i].offset );
