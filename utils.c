@@ -25,65 +25,20 @@ char *readline(FILE *arq_entrada){                                          //fu
     return string;                                                           //retorna a string
 }
 
-int chooseOption(){
-
-    int op;
-
-    printf("\n");
-
-	printf("=========================================\n");				 // apresenta o menu
-	printf("=              MENU OPÇÕES              =\n");
-	printf("=     1. Inserir a partir de arquivo    =\n");
-	printf("=      2. Listar todos os cadastros     =\n");
-	printf("=       3. Buscar por critério          =\n");
-	printf("=   	  4. Buscar por registro        =\n");
-	printf("=  5. Buscar por campo de um registro   =\n");
-	printf("=         6. Menu principal             =\n");
-	printf("=========================================\n\n");
-
-	printf("\nDigite uma opção: \n");
-	scanf("%d", &op);													// le a opção desejada
-	scanf("%*c"); //limpa o buffer do teclado
-
-	printf("\n");
-
-    return op; //Função para escolher uma opção
-	
-}
 int chooseOrganization(){
     
     int opt;
         printf("=====================================================\n");               // apresenta o menu de escolha de arquivo de saida
         printf("=                      MENU PRINCIPAL               =\n");
-        printf("=       1. Criar os arquivos                        =\n");
-        printf("=       2. Exibir um arquivo                        =\n");
+        printf("=       1. Criar os arquivos a partir do csv        =\n");
+        printf("=       2. Apresentar os registros                  =\n");
         printf("=       3. Criar arquivo de índice                  =\n");
-        printf("=       4. Finalizar programa                       =\n");
+        printf("=       4. Remover registro			                =\n");
+        printf("=       5. Inserir registro		                    =\n");
+        printf("=       6. Estatisticas do índice                   =\n");
+        printf("=       7. Estatisticas dos removidos               =\n");
+        printf("=       8. Finalizar programa                       =\n");
         printf("=====================================================\n\n");
-
-        printf("Digite uma opcao: ");
-        scanf("%d", &opt);                                                  // le a opção desejada
-        scanf("%*c");
-        
-        printf("\n");
-
-        return opt;
-}
-
-int chooseField(){
-
-    int opt;
-        printf("=======================================\n");                 // apresenta o menu de criterios
-        printf("=                 MENU                =\n");
-        printf("=          1. Buscar por cnpj         =\n");
-        printf("=       2. buscar por nome social     =\n");
-        printf("=      3. buscar por nome fantasia    =\n");
-        printf("=    4. buscar por data de registro   =\n");
-        printf("= 5. buscar por data de cancelamento  =\n");
-        printf("=  6. buscar por motivo cancelamento  =\n");
-        printf("=     7. buscar por nome da empresa   =\n");
-        printf("=      8. buscar por cnpj auditor     =\n");
-        printf("=======================================\n\n");
 
         printf("Digite uma opcao: ");
         scanf("%d", &opt);                                                  // le a opção desejada
@@ -455,7 +410,7 @@ int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
 	
 	
 	
-	return 0;
+	return cont;
 }
 
 

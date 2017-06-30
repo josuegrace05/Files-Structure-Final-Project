@@ -7,10 +7,8 @@
 
 typedef struct indice INDICE;
 
-int chooseOption();
 int chooseOrganization();
 char *readline(FILE *);
-int chooseField();
 int toUtf8(char *);
 
 int ler_arquivo_numfixreg();
