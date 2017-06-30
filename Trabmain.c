@@ -19,10 +19,10 @@
 
 int main(int argc, char *argv[]){
 
-	int op1 = 1; 
-	INDICE *index;													
+	int op1 = 1, tam1, tam2, tam3; 
+	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
 
-	while( op1 != 7){															
+	while( op1 != 8){															
 		
 		op1 = chooseOrganization();
 
@@ -45,8 +45,9 @@ int main(int argc, char *argv[]){
 			case 3:
 				
 				printf("caso3 criar indice\n");
-				index = criar_indices();
-				
+				tam1 = criar_indices(index1, index2, index3);
+				tam2 = tam1;
+				tam3 = tam2;
 				
 			break;
 				
@@ -69,6 +70,12 @@ int main(int argc, char *argv[]){
 			break;	
 			
 			case 7:
+				
+				printf("caso7\n");
+				
+			break;	
+			
+			case 8:
 				
 				printf("Finalizando o programa.\n");
 				
