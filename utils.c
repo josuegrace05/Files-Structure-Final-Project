@@ -338,15 +338,8 @@ void quicksort(INDICE *vector, int left, int right) {
 
 
 void ordeneIndice(INDICE *indiceArq, int n){
-	int i;
 
 	quicksort(indiceArq, 0, n-1);
-
-	for(i=0; i < n; i++){
-			
-			printf("%s %d \n", indiceArq[i].cnpj, indiceArq[i].offset);
-			
-		}
 
 }
 
@@ -367,11 +360,23 @@ int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
 		return buscaBinaria(indexArq, start, middle -1, key);
 }
 
+void removeIndex(INDICE *index, int *n, int pos){
+	int i;
+	//realizar a busca binária para saber qual a posição a ser removida
+	free(index[pos].cnpj);
+
+	for(i = pos; i < (*n)-1; i++){
+		index[i] = index[i+1];
+	}
+	(*n)--;
+
+	index = (INDICE*) realloc(index, sizeof(INDICE) * (*n) );
+}
 
 int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
 	
 	FILE *arq;
-	int cont = 0, contoffset = 0, i;
+	int cont = 0, contoffset = 0;
 	char c, *cnpj;
 	
 	
@@ -414,15 +419,6 @@ int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
 		ordeneIndice(index2, cont);
 		ordeneIndice(index3, cont);
 
-		printf("POS :%d\n", buscaBinaria(index1, 0, cont, "96.832.365/0001-51"));
-
-		/*
-		for(i=0; i < cont; i++){
-			
-			printf("%s %d \n", index1[i].cnpj, index1[i].offset);
-			
-		}
-	*/
 	
 	}else{
 		printf("falha ao arir o arquivo");

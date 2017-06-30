@@ -15,5 +15,9 @@ int ler_arquivo_numfixreg();
 int listar_registros_numfixreg();
 
 int criar_indices();
+void removeIndex(INDICE *, int *, int);
+int buscaBinaria(INDICE *, int, int, char *);
+
+
 
 #endif
