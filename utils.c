@@ -33,8 +33,8 @@ int chooseOrganization(){
         printf("=       1. Criar os arquivos a partir do csv        =\n");
         printf("=       2. Apresentar os registros                  =\n");
         printf("=       3. Criar arquivo de índice                  =\n");
-        printf("=       4. Remover registro			                =\n");
-        printf("=       5. Inserir registro		                    =\n");
+        printf("=       4. Remover registro                         =\n");
+        printf("=       5. Inserir registro                         =\n");
         printf("=       6. Estatisticas do índice                   =\n");
         printf("=       7. Estatisticas dos removidos               =\n");
         printf("=       8. Finalizar programa                       =\n");
@@ -350,7 +350,6 @@ void ordeneIndice(INDICE *indiceArq, int n){
 
 }
 
-<<<<<<< HEAD
 int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
 
 	int middle = (start + end)/2;
@@ -368,10 +367,8 @@ int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
 		return buscaBinaria(indexArq, start, middle -1, key);
 }
 
-INDICE *criar_indices(){
-=======
+
 int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
->>>>>>> 1ce6d16bf50f4f8cbe482b66c7850a39134a1c56
 	
 	FILE *arq;
 	int cont = 0, contoffset = 0, i;
@@ -413,35 +410,25 @@ int criar_indices(INDICE *index1, INDICE *index2, INDICE *index3){
 			
 		}		
 		
-<<<<<<< HEAD
-		ordeneIndice(index, cont);
-		printf("POS :%d\n", buscaBinaria(index, 0, cont, "96.832.365/0001-51"));
-		/*for(i=0; i < cont; i++){
-=======
 		ordeneIndice(index1, cont);
 		ordeneIndice(index2, cont);
 		ordeneIndice(index3, cont);
-		
+
+		printf("POS :%d\n", buscaBinaria(index1, 0, cont, "96.832.365/0001-51"));
+
+		/*
 		for(i=0; i < cont; i++){
->>>>>>> 1ce6d16bf50f4f8cbe482b66c7850a39134a1c56
 			
 			printf("%s %d \n", index1[i].cnpj, index1[i].offset);
 			
 		}
-	
+	*/
 	
 	}else{
 		printf("falha ao arir o arquivo");
 	}
 	
-<<<<<<< HEAD
-		
-	return index;
-=======
-	
-	
-	
 	return cont;
->>>>>>> 1ce6d16bf50f4f8cbe482b66c7850a39134a1c56
+
 }
 
