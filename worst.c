@@ -173,8 +173,9 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 	}
 
 	//se o topo alterar, alterar o topo no arquivo
-	//se o tamanho do (registro + 10) for maior que o do primeiro registro removido, deverá ser inserido no final do arquivo
-	//só é inserido na cabeça se o (registro + 10) for menor que o tamanho do topo, ou for igual
+	//se o tamanho do (registro + 2) for maior que o do primeiro registro removido, deverá ser inserido no final do arquivo
+	//se a diferença de tamanho é entre 2 e 10, insere mas haverá lixo
+	//se a diferença de tamanho for maior/igual a 10, insere e o resto será adicionado na lista de registros removidos
 
 	fread(&topo,sizeof(int),1,fp);
 	node = topo;
@@ -186,7 +187,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 	printf("Original : %d Novo : %d",nsize,regtam);
 
 	diff = nsize - regtam;
-	if(diff == 0  || diff > 10) {// Inserção no topo da lista
+	if(diff == 0  || diff > 1) {// Inserção no topo da lista
 		fread(&next,sizeof(int),1, fp);
 		fseek(fp,node,SEEK_SET); //volto para o inicio da lista
 		
@@ -200,6 +201,16 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 			fwrite(&topo,sizeof(int),1,fp);
 			fclose(fp);
 			printf("Registrado com Sucesso de modo identico!!");
+			return 0;
+		}
+
+
+		else if (diff < 10){
+			fwrite(&ast, sizeof(char), 1, fp);
+			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
+			fwrite(&topo,sizeof(int),1,fp);
+			fclose(fp);
+			printf("Incluido, mas haverá fragmentação externa!!");
 			return 0;
 		}
 
@@ -265,4 +276,10 @@ REGISTRO *myRecord(int *tam){
 
 	*tam = 52 + strlen(myregister->motivocancelamento)+ 1 + strlen(myregister->nomesocial) + 1 + strlen(myregister->nomefantasia) + 1 + strlen(myregister->nomeempresa) + 1 + 1;
 	return myregister;
+}
+
+char *chooseCNPJ(int i){
+
+	if(i==0) 
+
 }
