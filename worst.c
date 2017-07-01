@@ -16,7 +16,6 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 
 	// a intenção desse algoritmo é simular a lista no arquivo como se realmente fosse uma estrutura de dados, com nós e ponteiros --- apenas analogias
 
-
 	while(node != -1){
 		fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo
 		fread(&nsize,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
@@ -51,6 +50,7 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 
 	// primeira remoção --- funcionando
 	if(node == -1 && nsize == -1){
+		printf("Entreeeeei Porra");
 		*topo = new;
 		fseek(fp,new + 5,SEEK_SET); //pula para gravar o próximo
 		fwrite(&number,sizeof(int),1,fp); //escreve o -1 no próximo nó
@@ -171,6 +171,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		printf("Arquivo inexistente");
 		return -1;
 	}
+
 	//se o topo alterar, alterar o topo no arquivo
 	//se o tamanho do (registro + 10) for maior que o do primeiro registro removido, deverá ser inserido no final do arquivo
 	//só é inserido na cabeça se o (registro + 10) for menor que o tamanho do topo, ou for igual
@@ -182,7 +183,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 
 	fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo, + 1 por conta do asterisco
 	fread(&nsize,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
-	
+	printf("Original : %d Novo : %d",nsize,regtam);
 
 	diff = nsize - regtam;
 	if(diff == 0  || diff > 10) {// Inserção no topo da lista
@@ -192,18 +193,23 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		insere_registro(fp,novo); //insiro o novo registro no arquivo
 		topo = next; // topo recebe o próximo nó
 		
-
+		printf("NEW Topo :%d\n", topo);
 		//coube perfeiramente
 		if (diff == 0) { 
 			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 			fwrite(&topo,sizeof(int),1,fp);
 			fclose(fp);
+			printf("Registrado com Sucesso de modo identico!!");
 			return 0;
 		}
 
 		//caso necessite de tratamento de fragmentação interna na inserção
 		else {
-			node = ftell(fp); // node vai receber o byte offset do novo registro a ser inserido na lista
+			printf("Tratamento de fragmentação!!\n");
+			node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
+			printf("New = %ld!!\n",ftell(fp));
+			printf("Novo tamanho = %d!!\n",diff);
+			//fseek(fp,1,SEEK_CUR);
 			fwrite(&ast, sizeof(char), 1, fp);
 			fwrite(&diff, sizeof(int), 1, fp); //o tamanho desse novo registro é a diferença entre o tamanho original e o novo
 			
@@ -215,9 +221,48 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 
 
 	}
-	fclose(fp);
+	//insere no final do arquivo
+	else{
+		fseek(fp,0,SEEK_END);
+		insere_registro(fp,novo);
 
+	}
+	fclose(fp);
+	printf("Registrado com Sucesso!!");
 	return 0;
 }
 
 
+REGISTRO *myRecord(int *tam){
+	
+
+	FILE *fp = fopen("teste.txt","r");
+
+	REGISTRO *myregister = (REGISTRO *)malloc(sizeof(REGISTRO));
+
+
+
+	myregister->cnpj = readline(fp);
+	myregister->nomesocial = readline(fp);
+
+	
+	myregister->nomefantasia = readline(fp);
+
+	myregister->dataregistro = readline(fp);
+
+	myregister->datacancelamento = readline(fp);
+
+	if(strcmp(myregister->datacancelamento,"null") == 0)
+		strcpy(myregister->datacancelamento,"00/00/00"); 
+
+	myregister->motivocancelamento = readline(fp);
+
+	myregister->nomeempresa = readline(fp);
+
+	myregister->cnpjauditor = readline(fp);
+	fclose(fp);
+	
+
+	*tam = 52 + strlen(myregister->motivocancelamento)+ 1 + strlen(myregister->nomesocial) + 1 + strlen(myregister->nomefantasia) + 1 + strlen(myregister->nomeempresa) + 1 + 1;
+	return myregister;
+}

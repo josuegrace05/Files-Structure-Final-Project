@@ -274,7 +274,7 @@ int listar_registros_numfixreg(){
 	int contador =  3, number = 0;
 	char enter;
 	
-	arq = fopen("file1.bin", "r");  
+	arq = fopen("file3.bin", "r");  
 	if(arq==NULL){												//verifica se o arquivo existe
 		printf("Arquivo Inexistente");
 		return -1;
@@ -588,7 +588,7 @@ REGISTRO *cria_registro( int *tam ){
 }
 
 int insere_registro(FILE *arq, REGISTRO *novo){
-	
+	printf("Vou escever!!\n");
 	char separador = '$', separador2 = '#';
 	int size;
 	
