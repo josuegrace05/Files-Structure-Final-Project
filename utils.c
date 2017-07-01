@@ -667,13 +667,14 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 				fseek(arq1,-9,SEEK_CUR);								//volta para antes do *
 				insere_registro(arq1, novo);
 				
-				insereIndice(index1, tam,  novo->cnpj, anterior);
-				ordeneIndice(index1, *tam);
-				
 				if(aux2 != -1){
+					insereIndice(index1, tam,  novo->cnpj, anterior);
+					ordeneIndice(index1, *tam);
 					fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
 					fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
 				}else{
+					insereIndice(index1, tam,  novo->cnpj, anterior);
+					ordeneIndice(index1, *tam);
 					fseek(arq1, 0, SEEK_SET);
 					fwrite(&aux2 , sizeof(int), 1, arq1);
 				}
