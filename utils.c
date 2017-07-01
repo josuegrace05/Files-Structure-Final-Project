@@ -1,22 +1,6 @@
 #include "utils.h"
 
-struct indice{																	//lista adaptada para ser usada como vetor e fila para o trab de grafos
-	
-	char *cnpj;
-	int  offset;
-	
-};
 
-struct registro{
-	char *cnpj;
-	char *dataregistro;
-	char *datacancelamento;
-	char *cnpjauditor;
-	char *nomesocial;
-	char *nomefantasia;
-	char *motivocancelamento;
-	char *nomeempresa;
-};
 
 char *readline(FILE *arq_entrada){                                          //função para ler ate a um parametro
 

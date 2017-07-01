@@ -8,6 +8,26 @@
 typedef struct indice INDICE;
 typedef struct registro REGISTRO;
 
+
+
+struct indice{																	//lista adaptada para ser usada como vetor e fila para o trab de grafos
+	
+	char *cnpj;
+	int  offset;
+	
+};
+
+struct registro{
+	char *cnpj;
+	char *dataregistro;
+	char *datacancelamento;
+	char *cnpjauditor;
+	char *nomesocial;
+	char *nomefantasia;
+	char *motivocancelamento;
+	char *nomeempresa;
+};
+
 int chooseOrganization();
 char *readline(FILE *);
 int toUtf8(char *);
@@ -23,7 +43,7 @@ int remove_registro(char * cnpj, INDICE *index1, int *tam );
 int print_indice(INDICE *index1, int tam);
 
 void listar_removidos();
-
+int insere_registro(FILE *, REGISTRO *);
 
 REGISTRO *cria_registro( int *tam );
 int insereIndice(INDICE *indexArq, int *n, char * cnpj, int offset);

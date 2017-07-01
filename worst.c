@@ -156,3 +156,68 @@ void listar_worst_removidos(){
 /*
 	*/
 }
+
+
+//faltando inserir no arquivo de índice
+int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
+	FILE *fp;
+	char ast = '*';
+
+	int node, next,topo,nsize;
+	int diff;
+	fp = fopen("file3.bin","r+");
+
+	if(fp == NULL){
+		printf("Arquivo inexistente");
+		return -1;
+	}
+	//se o topo alterar, alterar o topo no arquivo
+	//se o tamanho do (registro + 10) for maior que o do primeiro registro removido, deverá ser inserido no final do arquivo
+	//só é inserido na cabeça se o (registro + 10) for menor que o tamanho do topo, ou for igual
+
+	fread(&topo,sizeof(int),1,fp);
+	node = topo;
+
+
+
+	fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo, + 1 por conta do asterisco
+	fread(&nsize,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
+	
+
+	diff = nsize - regtam;
+	if(diff == 0  || diff > 10) {// Inserção no topo da lista
+		fread(&next,sizeof(int),1, fp);
+		fseek(fp,node,SEEK_SET); //volto para o inicio da lista
+		
+		insere_registro(fp,novo); //insiro o novo registro no arquivo
+		topo = next; // topo recebe o próximo nó
+		
+
+		//coube perfeiramente
+		if (diff == 0) { 
+			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
+			fwrite(&topo,sizeof(int),1,fp);
+			fclose(fp);
+			return 0;
+		}
+
+		//caso necessite de tratamento de fragmentação interna na inserção
+		else {
+			node = ftell(fp); // node vai receber o byte offset do novo registro a ser inserido na lista
+			fwrite(&ast, sizeof(char), 1, fp);
+			fwrite(&diff, sizeof(int), 1, fp); //o tamanho desse novo registro é a diferença entre o tamanho original e o novo
+			
+			makeWorstList(fp, node, &topo, diff); // vai adicionar esse registro na lista de removidos
+
+			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
+			fwrite(&topo,sizeof(int),1,fp);
+		}
+
+
+	}
+	fclose(fp);
+
+	return 0;
+}
+
+

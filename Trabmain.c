@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "utils.h"
+#include "worst.h"
 
 
 
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]){
 				printf("digite o cnpj\n");
 				cnpj = readline(stdin);
 				remove_registro( cnpj, index1, &tam1 );
+				remove_registro_worst( cnpj, index3, &tam1 ); //remoção worst fit
 				
 				printf("caso4\n");
 				
@@ -69,6 +71,7 @@ int main(int argc, char *argv[]){
 				novoreg = cria_registro(&regtam);
 				
 				inserir_first(index1, &tam1, regtam, novoreg);
+				//inserir_worst(index3, &tam1, regtam, novoreg);
 				
 				printf("caso5\n");
 				
@@ -77,6 +80,7 @@ int main(int argc, char *argv[]){
 			case 6:
 				
 				listar_removidos();
+				listar_worst_removidos();
 				printf("caso6\n");
 				
 			break;	
