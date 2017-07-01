@@ -8,10 +8,10 @@ struct indice{																	//lista adaptada para ser usada como vetor e fila
 };
 
 struct registro{
-	char cnpj[19];
-	char dataregistro[9];
-	char datacancelamento[9];
-	char cnpjauditor[19];
+	char *cnpj;
+	char *dataregistro;
+	char *datacancelamento;
+	char *cnpjauditor;
 	char *nomesocial;
 	char *nomefantasia;
 	char *motivocancelamento;
@@ -178,7 +178,7 @@ int ler_arquivo_numfixreg(){
 			fwrite(nomefantasia , sizeof(char), aux, arq3);					
 			fwrite(&separador , sizeof(char), 1, arq3);
 			
-			aux = strlen(motivocancelamento)+1;
+			aux = strlen(motivocancelamento);
 			fwrite(motivocancelamento , sizeof(char), aux, arq1);
 			fwrite(&separador , sizeof(char), 1, arq1);
 			fwrite(motivocancelamento , sizeof(char), aux, arq2);
@@ -186,7 +186,7 @@ int ler_arquivo_numfixreg(){
 			fwrite(motivocancelamento , sizeof(char), aux, arq3);
 			fwrite(&separador , sizeof(char), 1, arq3);
 			
-			aux = strlen(nomeempresa)+1;
+			aux = strlen(nomeempresa);
 			fwrite(nomeempresa , sizeof(char), aux, arq1);
 			fwrite(&separador , sizeof(char), 1, arq1);
 			fwrite(nomeempresa , sizeof(char), aux, arq2);
@@ -528,6 +528,8 @@ int remove_registro(char * cnpj, INDICE *index1, int *tam ){
 		
 		cont += 2;														//marca tamanho
 		
+		printf("tamanho %d\n", cont);
+		
 		fwrite(&cont, sizeof(int), 1, arq1);							//escreve o tamanho
 		
 		fwrite(&cabecalho, sizeof(int), 1, arq1);						// escreve cabecalho
@@ -553,42 +555,50 @@ REGISTRO *cria_registro( int *tam ){
 	REGISTRO *myregister = (REGISTRO *)malloc(sizeof(REGISTRO));
 
 	printf("Digite o cnpj:\n");
-	scanf("%s",(myregister->cnpj));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->cnpj));
+	//scanf("%*c");
+	myregister->cnpj = readline(stdin);
 
 	printf("Digite o nome social:\n");
-	scanf("%m[^\n]s",&(myregister->nomesocial));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->nomesocial));
+	//scanf("%*c");
+	myregister->nomesocial = readline(stdin);
 
 	printf("Digite o nome fantasia:\n");
-	scanf("%m[^\n]s",&(myregister->nomefantasia));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->nomefantasia));
+	//scanf("%*c");
+	myregister->nomefantasia = readline(stdin);
 	
 	printf("Digite a data de registro:\n");
-	scanf("%s",(myregister->dataregistro));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->dataregistro));
+	//scanf("%*c");
+	myregister->dataregistro = readline(stdin);
 	
 	
 	printf("Digite a data de cancelamento:\n");
-	scanf("%s",(myregister->datacancelamento));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->datacancelamento));
+	//scanf("%*c");
+	myregister->datacancelamento = readline(stdin);
 
 	if(strcmp(myregister->datacancelamento,"null") == 0)
 		strcpy(myregister->datacancelamento,"00/00/00"); 
 		
 	printf("Digite o motivo do cancelamento:\n");
-	scanf("%m[^\n]s",&(myregister->motivocancelamento));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->motivocancelamento));
+	//scanf("%*c");
+	myregister->motivocancelamento = readline(stdin);
 	
 	printf("Digite o nome da empresa:\n");
-	scanf("%m[^\n]s",&(myregister->nomeempresa));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->nomeempresa));
+	//scanf("%*c");
+	myregister->nomeempresa = readline(stdin);
 
 	printf("Digite o cnpj auditor:\n");
-	scanf("%s",(myregister->cnpjauditor));
-	scanf("%*c");
+	//scanf("%m[^\n]s",&(myregister->cnpjauditor));
+	//scanf("%*c");
+	myregister->cnpjauditor = readline(stdin);
 	
-	*tam = 52 + strlen(myregister->motivocancelamento) + strlen(myregister->nomesocial) + strlen(myregister->nomefantasia) + strlen(myregister->nomeempresa);
+	*tam = 52 + strlen(myregister->motivocancelamento)+ 1 + strlen(myregister->nomesocial) + 1 + strlen(myregister->nomefantasia) + 1 + strlen(myregister->nomeempresa) + 1 + 1;
 
 	return myregister;
 }
@@ -612,11 +622,11 @@ int insere_registro(FILE *arq, REGISTRO *novo){
 	fwrite(novo->nomefantasia , sizeof(char), size, arq);					
 	fwrite(&separador , sizeof(char), 1, arq);
 	
-	size = strlen(novo->motivocancelamento)+1;
+	size = strlen(novo->motivocancelamento);
 	fwrite(novo->motivocancelamento , sizeof(char), size, arq);
 	fwrite(&separador , sizeof(char), 1, arq);
 	
-	size = strlen(novo->nomeempresa)+1;
+	size = strlen(novo->nomeempresa);
 	fwrite(novo->nomeempresa , sizeof(char), size, arq);
 	fwrite(&separador , sizeof(char), 1, arq);
 	
@@ -626,10 +636,26 @@ int insere_registro(FILE *arq, REGISTRO *novo){
 	return 0;
 }
 
+int insereIndice(INDICE *indexArq, int *n, char * cnpj, int offset){
+
+	indexArq = (INDICE *)realloc(indexArq, (sizeof(INDICE)*((*n)+1)));
+	
+	if(indexArq != NULL){
+
+		indexArq[*n].cnpj = cnpj;
+		indexArq[*n].offset = offset;
+		(*n)++;
+
+		return 1;	
+	}
+	
+	return 0;
+}
+
 int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 	
 	FILE *arq1;
-	int offset, node, size, aux, anterior;
+	int offset, node, size, aux, anterior = -1;
 	char separador2 = '#';
 	
 	arq1 = fopen("file1.bin", "r+");
@@ -646,18 +672,27 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 			
 			
 			if( size == regtam){
+				
+				printf("entrou caso igual\n");
 			
-				fseek(arq1,-9,SEEK_CUR);	
+				fseek(arq1,-9,SEEK_CUR);								//volta para antes do *
 				insere_registro(arq1, novo);
 				
-				fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
-				fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
+				if(anterior != -1){
+					fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
+					fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
+				}
+				
+				insereIndice(index1, tam,  novo->cnpj, anterior);
+				ordeneIndice(index1, *tam);
 				
 				fclose(arq1);
 				return 0;
 				
 			}
-			else if(size - regtam > 10){									// 9 é a soma dos dois ints mais o * que se prcisa colocar
+			else if(size - regtam > 10){	
+				
+				printf("entrou caso maior q 10\n");							
 				
 				fseek(arq1,-8,SEEK_CUR);								// volta para frente do *
 				
@@ -665,16 +700,21 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 				fwrite(&aux , sizeof(int), 1, arq1);
 				
 				fseek(arq1, 4,SEEK_CUR);								// vai até depois do indicador do prox
-				fseek(arq1, aux-9-1, SEEK_CUR);							// vai até o tamanho novo menos o tamanho ja percorrido menos o local onde vamos colocar o #
+				fseek(arq1, aux-10, SEEK_CUR);							// vai até o tamanho novo menos o tamanho ja percorrido menos o local onde vamos colocar o #
 				
 				fwrite(&separador2 , sizeof(char), 1, arq1);
-					
-				
+							
 				insere_registro(arq1, novo);
+				
+				insereIndice(index1, tam,  novo->cnpj, anterior + aux);
+				ordeneIndice(index1, *tam);
+				
 				fclose(arq1);
 				return 1;
 						
-			}else if(size - regtam < 10 && size - regtam >= 2){			// inserir o *
+			}else if(size - regtam < 10 && size - regtam >= 2){			
+			
+				printf("entrou caso entre 2 e 10\n");
 			
 				fseek(arq1,-8,SEEK_CUR);								// volta para frente do *
 				
@@ -686,8 +726,13 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 						
 				insere_registro(arq1, novo);
 				
-				fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
-				fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
+				if(anterior != -1){
+					fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
+					fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
+				}
+				
+				insereIndice(index1, tam,  novo->cnpj, anterior + aux);
+				ordeneIndice(index1, *tam);
 				
 				fclose(arq1);
 				return 1;
@@ -701,7 +746,10 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 		}
 	
 		fseek(arq1, 0, SEEK_END);
+		aux = ftell(arq1);
 		insere_registro(arq1, novo);
+		insereIndice(index1, tam,  novo->cnpj, aux);
+		ordeneIndice(index1, *tam);
 		fclose(arq1);
 		
 		return 1;

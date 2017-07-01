@@ -26,6 +26,8 @@ void listar_removidos();
 
 
 REGISTRO *cria_registro( int *tam );
+int insereIndice(INDICE *indexArq, int *n, char * cnpj, int offset);
+
 int inserir_first(INDICE *index1, int *tam, int regtam, REGISTRO *novo);
 
 #endif
