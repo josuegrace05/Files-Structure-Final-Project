@@ -472,7 +472,8 @@ void listar_removidos(){
 	}
 	fread(&topo,sizeof(int),1,fp); //lendo o cabecalho
 	node = topo;
-
+	
+	printf("Arquivo de indice 1\n");
 	printf("Topo:%d\n",topo);
 	while(node!=-1){
 		fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo vai até onde o node aponta --- o +1 serve para pular o asterisco
@@ -539,47 +540,31 @@ REGISTRO *cria_registro( int *tam ){
 	REGISTRO *myregister = (REGISTRO *)malloc(sizeof(REGISTRO));
 
 	printf("Digite o cnpj:\n");
-	//scanf("%m[^\n]s",&(myregister->cnpj));
-	//scanf("%*c");
 	myregister->cnpj = readline(stdin);
 
 	printf("Digite o nome social:\n");
-	//scanf("%m[^\n]s",&(myregister->nomesocial));
-	//scanf("%*c");
 	myregister->nomesocial = readline(stdin);
 
 	printf("Digite o nome fantasia:\n");
-	//scanf("%m[^\n]s",&(myregister->nomefantasia));
-	//scanf("%*c");
 	myregister->nomefantasia = readline(stdin);
 	
 	printf("Digite a data de registro:\n");
-	//scanf("%m[^\n]s",&(myregister->dataregistro));
-	//scanf("%*c");
 	myregister->dataregistro = readline(stdin);
 	
 	
 	printf("Digite a data de cancelamento:\n");
-	//scanf("%m[^\n]s",&(myregister->datacancelamento));
-	//scanf("%*c");
 	myregister->datacancelamento = readline(stdin);
 
 	if(strcmp(myregister->datacancelamento,"null") == 0)
 		strcpy(myregister->datacancelamento,"00/00/00"); 
 		
 	printf("Digite o motivo do cancelamento:\n");
-	//scanf("%m[^\n]s",&(myregister->motivocancelamento));
-	//scanf("%*c");
 	myregister->motivocancelamento = readline(stdin);
 	
 	printf("Digite o nome da empresa:\n");
-	//scanf("%m[^\n]s",&(myregister->nomeempresa));
-	//scanf("%*c");
 	myregister->nomeempresa = readline(stdin);
 
 	printf("Digite o cnpj auditor:\n");
-	//scanf("%m[^\n]s",&(myregister->cnpjauditor));
-	//scanf("%*c");
 	myregister->cnpjauditor = readline(stdin);
 	
 	*tam = 52 + strlen(myregister->motivocancelamento)+ 1 + strlen(myregister->nomesocial) + 1 + strlen(myregister->nomefantasia) + 1 + strlen(myregister->nomeempresa) + 1 + 1;
@@ -757,6 +742,61 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 	}
 	
 	
+	return 0;
+}
+
+int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *index3, int tam3){
+
+	int i, tam;
+	char c;
+	
+	
+	printf("tamanho lista 1: %d\n", tam1);
+	printf("tamanho lista 2: %d\n", tam2);
+	printf("tamanho lista 3: %d\n", tam3);
+	
+	tam = tam1;
+	
+	if(tam < tam2){
+		tam = tam2;
+	}
+	if(tam < tam3){
+		tam = tam3;
+	}
+	
+	printf("\n\nPara apresentar os registros precione enter para sair pressione q. \n\n");
+	
+	printf("Registros: \t\t indice1 \t\t\t\t\t\t indice 2 \t\t\t\t\t\t indice 3\n\n");
+	
+	for(i=0; i < tam; i++){
+		
+	 
+		printf("%d \t->", i); 
+		if(tam1 >i){
+			printf("\t cnpj:%s \t off-set:%d \t |",  index1[i].cnpj, index1[i].offset);
+		}else{
+			printf("\t cnpj:------------------ \t ------------- \t |");
+		}
+		if(tam2 >i){
+			printf("\t cnpj:%s \t off-set:%d \t |",  index2[i].cnpj, index2[i].offset);
+		}else{
+			printf("\t cnpj:------------------ \t ------------- \t |");
+		}
+		if(tam3 >i){
+			printf("\t cnpj:%s \t off-set:%d \t \n",  index3[i].cnpj, index3[i].offset);
+		}else{
+			printf("\t cnpj:------------------ \t ------------- \t |");
+		}
+		
+		scanf("%c", &c);
+		
+		if(c == 'q'){
+			return 0;
+		}
+	
+	}
+	
+											
 	return 0;
 }
 
