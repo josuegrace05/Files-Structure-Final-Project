@@ -19,9 +19,10 @@
 
 int main(int argc, char *argv[]){
 
-	int op1 = 1, tam1, tam2, tam3; 
+	int op1 = 1, tam1, tam2, tam3, regtam; 
 	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
 	char *cnpj;
+	REGISTRO *novoreg;
 
 	while( op1 != 8){															
 		
@@ -64,12 +65,18 @@ int main(int argc, char *argv[]){
 			
 			case 5:
 				
+				printf("digite o cnpj\n");
+				novoreg = cria_registro(&regtam);
+				
+				inserir_first(index1, &tam1, regtam, novoreg);
+				
 				printf("caso5\n");
 				
 			break;	
 			
 			case 6:
 				
+				listar_removidos();
 				printf("caso6\n");
 				
 			break;	

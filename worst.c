@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "worst.h"
 
 //tomar cuidado com arquivos duplicados, sempre verificar se eles estão com 30Kbytes
 

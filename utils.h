@@ -6,6 +6,7 @@
 #include <string.h>
 
 typedef struct indice INDICE;
+typedef struct registro REGISTRO;
 
 int chooseOrganization();
 char *readline(FILE *);
@@ -20,5 +21,11 @@ int buscaBinaria(INDICE *, int, int, char *);
 
 int remove_registro(char * cnpj, INDICE *index1, int *tam );
 int print_indice(INDICE *index1, int tam);
+
+void listar_removidos();
+
+
+REGISTRO *cria_registro( int *tam );
+int inserir_first(INDICE *index1, int *tam, int regtam, REGISTRO *novo);
 
 #endif

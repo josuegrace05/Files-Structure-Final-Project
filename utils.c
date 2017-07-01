@@ -7,6 +7,17 @@ struct indice{																	//lista adaptada para ser usada como vetor e fila
 	
 };
 
+struct registro{
+	char cnpj[19];
+	char dataregistro[9];
+	char datacancelamento[9];
+	char cnpjauditor[19];
+	char *nomesocial;
+	char *nomefantasia;
+	char *motivocancelamento;
+	char *nomeempresa;
+};
+
 char *readline(FILE *arq_entrada){                                          //função para ler ate a um parametro
 
     int cont = 0;
@@ -276,7 +287,7 @@ void print_registro(FILE *arq){
 int listar_registros_numfixreg(){
 
 	FILE *arq;
-	int contador =  3, number = 0, aux;
+	int contador =  3, number = 0;
 	char enter;
 	
 	arq = fopen("file1.bin", "r");  
@@ -288,14 +299,14 @@ int listar_registros_numfixreg(){
 	fseek(arq,4,SEEK_CUR);
 	
 	while(fgetc(arq)!=EOF){
-											//Enquanto o arquivo não chegou ao seu final
-		fseek(arq,-1,SEEK_CUR);										//cursor = cursor - 1 para compensar o fgetc()
+																		//Enquanto o arquivo não chegou ao seu final
+		fseek(arq,-1,SEEK_CUR);											//cursor = cursor - 1 para compensar o fgetc()
 		
 		if( fgetc(arq) == '*'){
 			
 			printf("REMOVIDO\n");
-			fread(&aux, sizeof(int), 1, arq);
-			fseek(arq, aux - 6  ,SEEK_CUR);
+			
+			while( fgetc(arq) != '#' );
 			
 		}else{
 				
@@ -438,13 +449,13 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3){
 		ordeneIndice(*index1, cont);
 		ordeneIndice(*index2, cont);
 		ordeneIndice(*index3, cont);
-
+		
+		fclose(arq);
 	
 	}else{
 		printf("falha ao arir o arquivo");
 	}
 	
-	fclose(arq);
 	
 	return cont;
 
@@ -461,9 +472,37 @@ int print_indice(INDICE *index1, int tam){
 	return 0;
 }
 
+void listar_removidos(){
+
+	int topo;	
+	int node;
+
+	int i = 0;
+	int size;
+	int aux;
+
+	FILE *fp = fopen("file1.bin","r");
+	if(fp==NULL) {
+		printf("Problemaa");
+		return;
+	}
+	fread(&topo,sizeof(int),1,fp); //lendo o cabecalho
+	node = topo;
+
+	printf("Topo:%d\n",topo);
+	while(node!=-1){
+		fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo vai até onde o node aponta --- o +1 serve para pular o asterisco
+		fread(&size,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
+		fread(&aux,sizeof(int),1, fp);
+		printf("%d - Size: %d  Offset :%d  Next :%d\n",i++,size,node,aux);
+		node = aux;
+
+	}
+}
+
 int remove_registro(char * cnpj, INDICE *index1, int *tam ){
 	
-	int pos, cont = 0, cabecalho = -1;
+	int pos, cont = 0, cabecalho;
 	FILE *arq1;
 	char c = '*';
 	
@@ -471,36 +510,208 @@ int remove_registro(char * cnpj, INDICE *index1, int *tam ){
 	
 	arq1 = fopen("file1.bin", "r+");	
 	
-	fread(&cabecalho, sizeof(int), 1, arq1);
-							
-	printf("%d\n", index1[pos].offset);
-	fseek(arq1, index1[pos].offset , SEEK_SET);						// vai ate offset
-	printf("Aqui : %c\n", fgetc(arq1));
-	fseek(arq1,-1,SEEK_CUR);
+	if(arq1 != NULL){
+		fread(&cabecalho, sizeof(int), 1, arq1);
+								
+		printf("%d\n", index1[pos].offset);
+		fseek(arq1, index1[pos].offset , SEEK_SET);						// vai ate offset
+		
+		fwrite(&c, sizeof(char), 1, arq1);								// escreve *
+		
+		while(c != '#'){												// le até #
+			cont++;
+			c = fgetc(arq1);
+			printf("%c", c);
+		}
+		
+		fseek(arq1,-cont,SEEK_CUR);										// volta para frente do *
+		
+		cont += 2;														//marca tamanho
+		
+		fwrite(&cont, sizeof(int), 1, arq1);							//escreve o tamanho
+		
+		fwrite(&cabecalho, sizeof(int), 1, arq1);						// escreve cabecalho
+		
+		fseek(arq1, 0, SEEK_SET);										// volta pro cabecalho
+		
+		
+		fwrite(&(index1[pos].offset), sizeof(int), 1, arq1);				// escreve a pos offset
+
+		removeIndex(index1, tam, pos);
 	
-	fwrite(&c, sizeof(char), 1, arq1);								// escreve *
-	
-	while(c != '#'){												// le até #
-		cont++;
-		c = fgetc(arq1);
-		printf("%c", c);
+		fclose(arq1);
+		
+	}else{
+		printf("falha ao arir o arquivo");
 	}
-	
-	fseek(arq1,-cont,SEEK_CUR);										// volta para frente do *
-	
-	cont += 2;														//marca tamanho
-	
-	fwrite(&cont, sizeof(int), 1, arq1);							//escreve o tamanho
-	
-	fwrite(&cabecalho, sizeof(int), 1, arq1);						// escreve cabecalho
-	
-	fseek(arq1, 0, SEEK_SET);										// volta pro cabecalho
-	
-	
-	fwrite(&index1[pos].offset, sizeof(int), 1, arq1);				// escreve a pos offset
-	
-	removeIndex(index1, tam, pos);
 	
 	return 0;
 }
+
+REGISTRO *cria_registro( int *tam ){
+	
+	REGISTRO *myregister = (REGISTRO *)malloc(sizeof(REGISTRO));
+
+	printf("Digite o cnpj:\n");
+	scanf("%s",(myregister->cnpj));
+	scanf("%*c");
+
+	printf("Digite o nome social:\n");
+	scanf("%m[^\n]s",&(myregister->nomesocial));
+	scanf("%*c");
+
+	printf("Digite o nome fantasia:\n");
+	scanf("%m[^\n]s",&(myregister->nomefantasia));
+	scanf("%*c");
+	
+	printf("Digite a data de registro:\n");
+	scanf("%s",(myregister->dataregistro));
+	scanf("%*c");
+	
+	
+	printf("Digite a data de cancelamento:\n");
+	scanf("%s",(myregister->datacancelamento));
+	scanf("%*c");
+
+	if(strcmp(myregister->datacancelamento,"null") == 0)
+		strcpy(myregister->datacancelamento,"00/00/00"); 
+		
+	printf("Digite o motivo do cancelamento:\n");
+	scanf("%m[^\n]s",&(myregister->motivocancelamento));
+	scanf("%*c");
+	
+	printf("Digite o nome da empresa:\n");
+	scanf("%m[^\n]s",&(myregister->nomeempresa));
+	scanf("%*c");
+
+	printf("Digite o cnpj auditor:\n");
+	scanf("%s",(myregister->cnpjauditor));
+	scanf("%*c");
+	
+	*tam = 52 + strlen(myregister->motivocancelamento) + strlen(myregister->nomesocial) + strlen(myregister->nomefantasia) + strlen(myregister->nomeempresa);
+
+	return myregister;
+}
+
+int insere_registro(FILE *arq, REGISTRO *novo){
+	
+	char separador = '$', separador2 = '#';
+	int size;
+	
+	fwrite(novo->cnpj, sizeof(char), 18, arq);	
+	fwrite(novo->dataregistro, sizeof(char), 8, arq);					// então coloca todos os dados de forma organizada no arquivo
+	fwrite(novo->datacancelamento, sizeof(char), 8, arq);				// para facilitar o uso do arquivo, os campos de tamanho fixo foram colocados todos juntos
+	fwrite(novo->cnpjauditor, sizeof(char), 18, arq);	
+
+	size = strlen(novo->nomesocial);
+	fwrite(novo->nomesocial , sizeof(char), size, arq);
+	fwrite(&separador , sizeof(char), 1, arq);							// inserção do delimitador no final dos campos de tamanho variável
+	
+	
+	size = strlen(novo->nomefantasia);
+	fwrite(novo->nomefantasia , sizeof(char), size, arq);					
+	fwrite(&separador , sizeof(char), 1, arq);
+	
+	size = strlen(novo->motivocancelamento)+1;
+	fwrite(novo->motivocancelamento , sizeof(char), size, arq);
+	fwrite(&separador , sizeof(char), 1, arq);
+	
+	size = strlen(novo->nomeempresa)+1;
+	fwrite(novo->nomeempresa , sizeof(char), size, arq);
+	fwrite(&separador , sizeof(char), 1, arq);
+	
+	fwrite(&separador2 , sizeof(char), 1, arq);						// escreve separador de registro
+
+	
+	return 0;
+}
+
+int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
+	
+	FILE *arq1;
+	int offset, node, size, aux, anterior;
+	char separador2 = '#';
+	
+	arq1 = fopen("file1.bin", "r+");
+	
+	if(arq1 != NULL){
+																		// pega o valor do cabecalho
+		fread(&node, sizeof(int), 1, arq1);								// anda nos removidos
+		
+		while(node != -1){
+			
+			fseek(arq1,node + 1,SEEK_SET);								//cursor no começo do arquivo vai até onde o node aponta --- o +1 serve para pular o asterisco
+			fread(&size,sizeof(int),1, arq1);							//nsize vai receber o tamanho do registro removido deste nó
+			fread(&offset,sizeof(int),1, arq1);
+			
+			
+			if( size == regtam){
+			
+				fseek(arq1,-9,SEEK_CUR);	
+				insere_registro(arq1, novo);
+				
+				fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
+				fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
+				
+				fclose(arq1);
+				return 0;
+				
+			}
+			else if(size - regtam > 10){									// 9 é a soma dos dois ints mais o * que se prcisa colocar
+				
+				fseek(arq1,-8,SEEK_CUR);								// volta para frente do *
+				
+				aux = size - regtam;
+				fwrite(&aux , sizeof(int), 1, arq1);
+				
+				fseek(arq1, 4,SEEK_CUR);								// vai até depois do indicador do prox
+				fseek(arq1, aux-9-1, SEEK_CUR);							// vai até o tamanho novo menos o tamanho ja percorrido menos o local onde vamos colocar o #
+				
+				fwrite(&separador2 , sizeof(char), 1, arq1);
+					
+				
+				insere_registro(arq1, novo);
+				fclose(arq1);
+				return 1;
+						
+			}else if(size - regtam < 10 && size - regtam >= 2){			// inserir o *
+			
+				fseek(arq1,-8,SEEK_CUR);								// volta para frente do *
+				
+				aux = size - regtam;
+				
+				fseek(arq1, aux-2 ,SEEK_CUR);							// avança até antes do #							
+				
+				fwrite(&separador2 , sizeof(char), 1, arq1);			// escreve #
+						
+				insere_registro(arq1, novo);
+				
+				fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
+				fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
+				
+				fclose(arq1);
+				return 1;
+			}
+			
+			
+			//printf("Size: %d  Offset :%d  Next :%d\n",size,node,offset);
+			anterior = offset;
+			node = offset;
+			
+		}
+	
+		fseek(arq1, 0, SEEK_END);
+		insere_registro(arq1, novo);
+		fclose(arq1);
+		
+		return 1;
+	
+	}else{
+		printf("falha ao arir o arquivo");
+	}
+	
+	
+	return 0;
+}
+
 
