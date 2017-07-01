@@ -59,15 +59,14 @@ int main(int argc, char *argv[]){
 				printf("digite o cnpj\n");
 				cnpj = readline(stdin);
 				remove_registro( cnpj, index1, &tam1 );
-				remove_registro_worst( cnpj, index3, &tam1 ); //remoção worst fit
+			//	remove_registro_worst( cnpj, index3, &tam1 ); //remoção worst fit
 				
 				printf("caso4\n");
 				
 			break;	
 			
 			case 5:
-				
-				printf("digite o cnpj\n");
+
 				novoreg = cria_registro(&regtam);
 				
 				inserir_first(index1, &tam1, regtam, novoreg);

@@ -1,5 +1,5 @@
 all: 
-	gcc -o T2arquivos Trabmain.c utils.c -Wall -I. -g
+	gcc -o T2arquivos Trabmain.c utils.c worst.c -Wall -I. -g
 
 run: 
 	./T2arquivos
