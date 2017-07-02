@@ -31,6 +31,7 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 			
 			//caso o novo nó seja inserido na frente da lista, deve haver mudança do topo -- funcionando
 			if(node == *topo){
+				printf("Frente da lista\n");
 				*topo = new; // new vira o novo topo
 				fseek(fp,new + 5,SEEK_SET); // vou para o ponteiro do próximo nó, do novo nó removido
 				fwrite(&node,sizeof(int),1,fp); //escrevo o offset do próximo nó, que está armazenado no node
@@ -38,10 +39,11 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 			}
 			//caso entre no meio do nó
 			else {
+				printf("No meio \n");
 				fseek(fp,ant + 5,SEEK_SET); //Vai para o nó anterior, mudar o próximo nó para apontar para o novo
 				fwrite(&new,sizeof(int),1,fp); // faço o nó anterio apontar para o novo nó removido
 
-				fseek(fp,new + 5,SEEK_CUR); // vou para o ponteiro do próximo nó, do novo nó removido
+				fseek(fp,new + 5,SEEK_SET); // vou para o ponteiro do próximo nó, do novo nó removido
 				fwrite(&node,sizeof(int),1,fp); //escrevo o offset do próximo nó, que está armazenado no node
 				return;
 			}
@@ -50,7 +52,7 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 
 	// primeira remoção --- funcionando
 	if(node == -1 && nsize == -1){
-		printf("Entreeeeei Porra");
+		printf("Primeira vez");
 		*topo = new;
 		fseek(fp,new + 5,SEEK_SET); //pula para gravar o próximo
 		fwrite(&number,sizeof(int),1,fp); //escreve o -1 no próximo nó
@@ -59,6 +61,7 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 
 	//insere no final da lista --- funcionando
 	else{
+		printf("Final\n");
 		fseek(fp,-4,SEEK_CUR); //volto 4 pq o cursor sai do while depois do ultimo int
 		fwrite(&new,sizeof(int),1,fp); // o ultimo nó recebe como próximo o novo nó a ser inserido
 		
@@ -93,8 +96,7 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 							
 	printf("%d\n", index3[pos].offset);
 	fseek(arq3, index3[pos].offset , SEEK_SET);						// vai ate offset
-	printf("Aqui : %c\n", fgetc(arq3));
-	fseek(arq3,-1,SEEK_CUR);
+
 	
 	fwrite(&c, sizeof(char), 1, arq3);								// escreve *
 	
@@ -244,10 +246,17 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 }
 
 
-REGISTRO *myRecord(int *tam){
+REGISTRO *myRecord(int *tam, int qual){
 	
+	FILE *fp;
 
-	FILE *fp = fopen("teste.txt","r");
+	//printf("Qual %d", qual);
+
+	if (qual == 0) fp = fopen("teste.txt","r"); //
+	if (qual == 1) fp = fopen("teste2.txt","r");
+	if (qual == 2) fp = fopen("teste3.txt","r");
+	if (qual == 4) fp = fopen("teste4.txt","r");
+
 
 	REGISTRO *myregister = (REGISTRO *)malloc(sizeof(REGISTRO));
 
@@ -276,10 +285,4 @@ REGISTRO *myRecord(int *tam){
 
 	*tam = 52 + strlen(myregister->motivocancelamento)+ 1 + strlen(myregister->nomesocial) + 1 + strlen(myregister->nomefantasia) + 1 + strlen(myregister->nomeempresa) + 1 + 1;
 	return myregister;
-}
-
-char *chooseCNPJ(int i){
-
-	if(i==0) 
-
 }

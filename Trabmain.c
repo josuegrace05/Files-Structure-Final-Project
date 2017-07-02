@@ -23,6 +23,7 @@ int main(int argc, char *argv[]){
 	int op1 = 1, tam1, tam2, tam3, regtam; 
 	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
 	char *cnpj;
+	int teste;
 	REGISTRO *novoreg;
 
 	while( op1 != 8){															
@@ -70,8 +71,9 @@ int main(int argc, char *argv[]){
 			case 5:
 				
 				printf("digite o cnpj\n");
+				scanf("%d",&teste);
 				//novoreg = cria_registro(&regtam);
-				novoreg = myRecord(&regtam);
+				novoreg = myRecord(&regtam,teste);
 				printf("%s",novoreg->cnpjauditor);
 				//inserir_first(index1, &tam1, regtam, novoreg);
 				inserir_worst(index3, &tam1, regtam, novoreg);
