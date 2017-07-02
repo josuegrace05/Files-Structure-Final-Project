@@ -79,7 +79,7 @@ int main(int argc, char *argv[]){
 			case 6:
 				
 				listar_removidos();
-				listar_worst_removidos();
+				//listar_worst_removidos();
 				printf("caso6\n");
 				
 			break;	

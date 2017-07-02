@@ -47,7 +47,7 @@ int chooseOrganization(){
 int toUtf8(char *filename){ //Função para converter o arquivo em utf8
 
     char *str = (char *)malloc(sizeof(char)*10);
-    char *cmd = (char *)malloc(sizeof(char)*42);
+    char *cmd = (char *)malloc(sizeof(char)*45);
     int n = strlen(filename);
 
     cmd[41] = '\0';
@@ -56,11 +56,11 @@ int toUtf8(char *filename){ //Função para converter o arquivo em utf8
     strcpy(cmd,"iconv -c -f iso-8859-1 -t utf-8 -o ");
     strcat(cmd,str);
 
-    cmd = (char *)realloc(cmd,(42 + n)*sizeof(char));
-    cmd[41+n] = '\0';
+    cmd = (char *)realloc(cmd,(45 + n)*sizeof(char));
+    cmd[44+n] = '\0';
     strcat(cmd,filename);
     free(str);
-
+    printf("CMD: %s.\n", cmd);
     if(system(cmd) == -1){
 
         free(cmd);
@@ -340,9 +340,13 @@ void quicksort(INDICE *vector, int left, int right) {
 	int r;
 
 	if (left < right) {
+		//printf("5\n");
 		r = partition(vector, left, right);
+		//printf("6\n");
 		quicksort(vector, left, r-1);
+		//printf("7\n");
 		quicksort(vector, r+1, right);
+		//printf("8\n");
 	}
 }
 
@@ -472,8 +476,7 @@ void listar_removidos(){
 	}
 	fread(&topo,sizeof(int),1,fp); //lendo o cabecalho
 	node = topo;
-
-	printf("Topo:%d\n",topo);
+	printf("Topo: %d\n", topo);
 	while(node!=-1){
 		fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo vai até onde o node aponta --- o +1 serve para pular o asterisco
 		fread(&size,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
@@ -639,7 +642,7 @@ int insereIndice(INDICE *indexArq, int *n, char * cnpj, int offset){
 int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 	
 	FILE *arq1;
-	int offset, node, size, aux, aux2 = -2, anterior = -1;
+	int offset, node, size, aux, aux2 = -1, anterior;
 	char separador2 = '#';
 	
 	arq1 = fopen("file1.bin", "r+");
@@ -652,33 +655,30 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 		
 		while(node != -1){
 			
-			aux2 ++;
-			
 			fseek(arq1,node + 1,SEEK_SET);								//cursor no começo do arquivo vai até onde o node aponta --- o +1 serve para pular o asterisco
 			fread(&size,sizeof(int),1, arq1);							//nsize vai receber o tamanho do registro removido deste nó
 			fread(&offset,sizeof(int),1, arq1);
 			
-			
-			
-			if( size == regtam){
+			if(size == regtam){
 				
 				printf("entrou caso igual\n");
 			
-				fseek(arq1,-9,SEEK_CUR);								//volta para antes do *
+				fseek(arq1,-9,SEEK_CUR);
+				printf("1\n");								//volta para antes do *
 				insere_registro(arq1, novo);
-				
-				if(aux2 != -1){
-					insereIndice(index1, tam,  novo->cnpj, anterior);
-					ordeneIndice(index1, *tam);
-					fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
+				printf("2\n");
+				//insereIndice(index1, tam,  novo->cnpj, anterior);
+				printf("3\n");
+				//ordeneIndice(index1, *tam);
+				printf("4\n");				
+				if(offset != -1){//caso o próximo não for o último da lista, coloca ele como cabeçalho
+					fseek(arq1, 0, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
 					fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
-				}else{
-					insereIndice(index1, tam,  novo->cnpj, anterior);
-					ordeneIndice(index1, *tam);
+				
+				}else{//caso o próximo for o último na lista, atualiza o cabeçalho com -1
 					fseek(arq1, 0, SEEK_SET);
 					fwrite(&aux2 , sizeof(int), 1, arq1);
 				}
-				
 				
 				fclose(arq1);
 				return 0;
@@ -700,13 +700,14 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 							
 				insere_registro(arq1, novo);
 				
-				insereIndice(index1, tam,  novo->cnpj, anterior + aux);
-				ordeneIndice(index1, *tam);
+				//precisa tratar o caso da frag ext aqui
+				//insereIndice(index1, tam,  novo->cnpj, anterior + aux);
+				//ordeneIndice(index1, *tam);
 				
 				fclose(arq1);
 				return 1;
 						
-			}else if(size - regtam < 10 && size - regtam >= 2){			
+			}else if(size - regtam <= 10 && size - regtam >= 2){			
 			
 				printf("entrou caso entre 2 e 10\n");
 			
@@ -719,15 +720,13 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 				fwrite(&separador2 , sizeof(char), 1, arq1);			// escreve #
 						
 				insere_registro(arq1, novo);
+				//insereIndice(index1, tam,  novo->cnpj, anterior + aux);
+				//ordeneIndice(index1, *tam);
 				
-				if(aux2 != -1){
-					insereIndice(index1, tam,  novo->cnpj, anterior + aux);
-					ordeneIndice(index1, *tam);
-					fseek(arq1, anterior+5, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
+				if(offset != -1){
+					fseek(arq1, 0, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
 					fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
 				}else{
-					insereIndice(index1, tam,  novo->cnpj, anterior + aux);
-					ordeneIndice(index1, *tam);
 					fseek(arq1, 0, SEEK_SET);
 					fwrite(&aux2 , sizeof(int), 1, arq1);
 				}
@@ -746,8 +745,8 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 		fseek(arq1, 0, SEEK_END);
 		aux = ftell(arq1);
 		insere_registro(arq1, novo);
-		insereIndice(index1, tam,  novo->cnpj, aux);
-		ordeneIndice(index1, *tam);
+		//insereIndice(index1, tam,  novo->cnpj, aux);
+		//ordeneIndice(index1, *tam);
 		fclose(arq1);
 		
 		return 1;
