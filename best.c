@@ -1,4 +1,3 @@
-#include "utils.h"
 #include "worst.h"
 
 //new é o lugar do registro removido, tsize é o tamanho
@@ -223,7 +222,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 			else if (diff < -9){
 				printf("Tratamento de fragmentação!!\n");
 				node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
-				printf("Nessw = %ld!!\n",node);
+				printf("Nessw = %ld!!\n",(int long)node);
 				diff *=-1; // deixando positivo
 				printf("Novo tamanho = %d!!\n",diff);
 				//fseek(fp,1,SEEK_CUR);

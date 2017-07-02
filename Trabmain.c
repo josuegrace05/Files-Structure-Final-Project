@@ -3,6 +3,7 @@
 #include <string.h>
 #include "utils.h"
 #include "worst.h"
+#include "best.h"
 
 //Joao Pedro Sousa dos Reis
 //9293373
@@ -22,7 +23,7 @@ int main(int argc, char *argv[]){
 	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
 	char *cnpj, c;
 	REGISTRO *novoreg;
-	int teste;
+	//int teste;
 
 	while(op1 != 8){															
 		
@@ -88,12 +89,12 @@ int main(int argc, char *argv[]){
 
 					//scanf("%d",&teste); João dexei comentado pra vc fazer seus testes ta ??
 					//novoreg = myRecord(&regtam,teste);
-					novoreg = criar_registro(&regtam);
+					novoreg = cria_registro(&regtam);
 				}
 
 				else if(c == 'N' || c == 'n'){//caso queria gravar de um arquivo
 					//ler_arquivo_numfixreg();//Lê do arquivo csv de entrada
-					novoreg = myRecord(&regtam,teste);
+					//novoreg = myRecord(&regtam,teste);
 				}
 
 				printf("Inserindo usando a allocação first_fit....\n");

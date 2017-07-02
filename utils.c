@@ -394,7 +394,7 @@ int carregaIndices(FILE *arq1, INDICE **index1, INDICE **index2, INDICE **index3
 	char *cnpj = (char*) malloc(sizeof(char) * 19);
 	cnpj[18] = '\0';
 
-	while(fscanf(arq1,"%s %d", cnpj, offset) != EOF){
+	while(fscanf(arq1,"%s %d", cnpj, &offset) != EOF){
 			
 		*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (cont+1) );
 		*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (cont+1) );
@@ -421,7 +421,7 @@ int carregaIndices(FILE *arq1, INDICE **index1, INDICE **index2, INDICE **index3
 int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 	
 	FILE *arq;
-	int contoffset = 4, offset;
+	int contoffset = 4;
 	char c, *cnpj;
 
 	FILE *arq1 = fopen("index1.txt","r+");

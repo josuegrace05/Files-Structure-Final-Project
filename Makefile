@@ -1,5 +1,5 @@
 all: 
-	gcc -o Trabmain Trabmain.c utils.c worst.c -Wall -I. -g
+	gcc -o Trabmain Trabmain.c utils.c worst.c best.c -Wall -I. -g
 
 run: 
 	./Trabmain

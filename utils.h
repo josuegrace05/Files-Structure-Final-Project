@@ -53,5 +53,7 @@ int inserir_first(INDICE *, int *, int, REGISTRO *);
 int estatistica(INDICE *, int, INDICE *, int, INDICE *, int);
 int gravaIndice(INDICE *, int, INDICE *, int, INDICE *, int);
 
+void ordeneIndice(INDICE *, int);
+
 
 #endif

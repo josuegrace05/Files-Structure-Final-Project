@@ -1,4 +1,3 @@
-#include "utils.h"
 #include "worst.h"
 
 //tomar cuidado com arquivos duplicados, sempre verificar se eles estão com 30Kbytes
@@ -218,7 +217,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		else {
 			printf("Tratamento de fragmentação!!\n");
 			node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
-			printf("Nedsw = %ld!!\n",node);
+			printf("Nedsw = %ld!!\n",(int long)node);
 			printf("Novo tamanho = %d!!\n",diff);
 			//fseek(fp,1,SEEK_CUR);
 			fwrite(&ast, sizeof(char), 1, fp);
