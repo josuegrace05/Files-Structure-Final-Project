@@ -202,9 +202,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		if (diff == 0) { 
 			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 			fwrite(&topo,sizeof(int),1,fp);
-			fclose(fp);
 			printf("Registrado com Sucesso de modo identico!!");
-			return 0;
 		}
 
 
@@ -213,16 +211,14 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 			fwrite(&ast, sizeof(char), 1, fp);
 			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 			fwrite(&topo,sizeof(int),1,fp);
-			fclose(fp);
 			printf("Incluido, mas haverá fragmentação externa!!");
-			return 0;
 		}
 
 		//caso necessite de tratamento de fragmentação interna na inserção
 		else {
 			printf("Tratamento de fragmentação!!\n");
 			node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
-			printf("New = %ld!!\n",ftell(fp));
+			printf("Nedsw = %ld!!\n",node);
 			printf("Novo tamanho = %d!!\n",diff);
 			//fseek(fp,1,SEEK_CUR);
 			fwrite(&ast, sizeof(char), 1, fp);

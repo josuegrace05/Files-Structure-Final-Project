@@ -60,8 +60,8 @@ int main(int argc, char *argv[]){
 				printf("digite o cnpj\n");
 				cnpj = readline(stdin);
 				remove_registro(cnpj, index1, &tam1);
+				remove_registro_best(cnpj, index2, &tam2);  //remoção best fit
 				remove_registro_worst(cnpj, index3, &tam3); //remoção worst fit
-				
 				printf("caso4\n");
 				
 			break;	
@@ -79,10 +79,15 @@ int main(int argc, char *argv[]){
 
 				inserir_first(index1, &tam1, regtam, novoreg);
 				inserir_worst(index3, &tam3, regtam, novoreg);
+				printf("Começou....\n");
+				//inserir_best(index2, &tam2, regtam, novoreg);
 
-				
+				//verificar todos os caros de inserir first para ver se insere no arquivo de index sempre
 				printf("index 1\n");
 				print_indice(index1, tam1);
+
+				printf("index 2\n");
+				print_indice(index2, tam2);
 
 				printf("Index 3\n");
 				print_indice(index3, tam3);
@@ -100,9 +105,11 @@ int main(int argc, char *argv[]){
 			break;	
 			
 			case 7:
-				printf("-------------Fist Fit--------------");
+				printf("-------------Fist Fit--------------\n");
 				listar_removidos();
-				printf("-------------Worst Fit-------------");
+				printf("-------------Best Fit--------------\n");
+				listar_best_removidos();
+				printf("-------------Worst Fit-------------\n");
 				listar_worst_removidos();
 				printf("caso7\n");
 				

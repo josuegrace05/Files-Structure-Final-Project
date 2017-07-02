@@ -8,7 +8,7 @@ debug:
 	valgrind --leak-check=full ./T2arquivos
 
 worst: 
-	gcc -o T2arquivos Trabmain.c worst.c utils.c -Wall -I. -g
+	gcc -o T2arquivos Trabmain.c worst.c best.c utils.c -Wall -I. -g
 
 clean:
 	rm -f *.bin
