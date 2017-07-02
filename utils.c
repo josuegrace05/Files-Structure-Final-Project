@@ -1,6 +1,7 @@
 #include "utils.h"
-
-
+#define cifrao '$'
+#define hashtag '#'
+#define asterisco '*'
 
 char *readline(FILE *arq_entrada){                                          //função para ler ate a um parametro
 
@@ -60,7 +61,6 @@ int toUtf8(char *filename){ //Função para converter o arquivo em utf8
     cmd[44+n] = '\0';
     strcat(cmd,filename);
     free(str);
-    printf("CMD: %s.\n", cmd);
     if(system(cmd) == -1){
 
         free(cmd);
@@ -78,16 +78,15 @@ int ler_arquivo_numfixreg(){
 	FILE *arq_entrada;													// gera as variaveis necessarias
 	char *entrada;
 	char *cnpj, *dataregistro, *datacancelamento, *cnpjauditor, *nomesocial, *nomefantasia, *motivocancelamento, *nomeempresa;
-	char separador = '$', separador2 = '#';
+	char separador = cifrao, separador2 = hashtag;
 	int aux = -1, convert = 0, number = 0;
 	
-	printf("\nDigite o nome do arquivo que deseja ler:\n");
-	entrada = readline(stdin);											// pede o nome do arquivo de onde irá ler (.csv)
-	
-	convert = toUtf8(entrada);
+	printf("\nDigite o nome do arquivo que deseja ler:\n");   // pede o nome do arquivo de onde irá ler (.csv)
+	entrada = readline(stdin);											
+	convert = toUtf8(entrada);								//convert o arquivo no formato utf8
 
 	if(convert == 1)
-		arq_entrada = fopen("temp.csv", "r"); //convert o arquivo em um formato utf8
+		arq_entrada = fopen("temp.csv", "r"); //Usa o arquivo temporário convertido
 	else
 		arq_entrada = fopen(entrada, "r"); //Se não conseguir converter, usa o arquivo original
 		
@@ -99,9 +98,18 @@ int ler_arquivo_numfixreg(){
 	
 	if(arq1 != NULL && arq2 != NULL && arq3 != NULL && arq_entrada != NULL){
 		
-		fwrite(&aux, sizeof(int), 1, arq1);
-		fwrite(&aux, sizeof(int), 1, arq2);								// escreve cabecalho
-		fwrite(&aux, sizeof(int), 1, arq3);
+		// escreve o registro de cabeçalho se o arquivo estiver fazio
+		fseek(arq1, 0, SEEK_END); 
+		if(ftell(arq1) == 0)
+			fwrite(&aux, sizeof(int), 1, arq1);
+
+		fseek(arq2, 0, SEEK_END);
+		if(ftell(arq2) == 0)
+			fwrite(&aux, sizeof(int), 1, arq2);								
+		
+		fseek(arq3, 0, SEEK_END);
+		if(ftell(arq3) == 0)
+			fwrite(&aux, sizeof(int), 1, arq3);
 		
 		while(fgetc(arq_entrada) != EOF){								// enquanto existirem registros
 			
@@ -182,8 +190,6 @@ int ler_arquivo_numfixreg(){
 			fwrite(&separador2 , sizeof(char), 1, arq2);
 			fwrite(&separador2 , sizeof(char), 1, arq3);
 
-			//fgetc(arq);													// Foi verificado que no final de cada registro existe um /n, esse fgetc() pega este caracter
-			
 			number++;
 
 			free(cnpj);													// libera as strings usadas
@@ -199,7 +205,7 @@ int ler_arquivo_numfixreg(){
 		
 		printf("\n%d registro(s) foram adicionado(s)\n", number);
 
-		if(convert)
+		if(convert) //apaga o arquivo temporário se foi criado
 			remove("temp.csv");
 
 		fclose(arq1);													// após adicionar todos os registros fecha os arquivos
@@ -208,10 +214,11 @@ int ler_arquivo_numfixreg(){
 		fclose(arq_entrada);
 			
 	}else{
-		printf("\nfalha ao abrir o arquivo\n");                           // caso algum dos dois arquivos seham nulos
+		printf("\nfalha ao abrir um arquivo\n");                           // caso algum dos 4 arquivos sejam nulo
+		return 0;
 	}
 	
-	return 0;
+	return 1;
 }
 
 
@@ -219,7 +226,6 @@ int ler_arquivo_numfixreg(){
 // recebe um arquivo válido com o cursor já apontado para o proximo registro a ser impresso
 void print_registro(FILE *arq){
 	
-
 	char *cnpj, *dataregistro, *datacancelamento, *cnpjauditor; // campos fixos
 	char *nomesocial, *nomefantasia, *motivocancelamento, *nomeempresa; //campos variáveis
 	
@@ -271,30 +277,32 @@ void print_registro(FILE *arq){
 int listar_registros_numfixreg(){
 
 	FILE *arq;
-	int contador =  3, number = 0;
+	int contador =  1, number = 0;
 	char enter;
 	
 	arq = fopen("file1.bin", "r");  
-	if(arq==NULL){												//verifica se o arquivo existe
+	
+	if(arq == NULL){												//verifica se o arquivo existe
 		printf("Arquivo Inexistente");
-		return -1;
+		return 0;
 	}
 
-	fseek(arq,4,SEEK_CUR);
+	fseek(arq, 4, SEEK_CUR);//pula o registro de cabeçalho
 	
-	while(fgetc(arq)!=EOF){
+	while(fgetc(arq) != EOF){
 																		//Enquanto o arquivo não chegou ao seu final
 		fseek(arq,-1,SEEK_CUR);											//cursor = cursor - 1 para compensar o fgetc()
 		
-		if( fgetc(arq) == '*'){
+		if(fgetc(arq) == asterisco){
 			
-			printf("REMOVIDO\n");
+			printf("\nREMOVIDO\n");
 			
-			while( fgetc(arq) != '#' );
+			while(fgetc(arq) != hashtag);//lê o registro removido
 			
 		}else{
 				
 			fseek(arq,-1,SEEK_CUR);														//um registro inteiro é printado na tela
+			
 			if(contador-- > 0) {
 				printf("\nRegistro %d\n", number++);
 				print_registro(arq);	
@@ -305,14 +313,14 @@ int listar_registros_numfixreg(){
 				scanf("%c", &enter);
 				if(enter == 'q')
 					break;
-				contador = 3;
-
+				contador = 1;
 			}	
 		}									
 	
 	}
+
 	fclose(arq);										
-	return 0;
+	return 1;
 }
 
 void swap(INDICE *vector, int i, int j) {
@@ -340,23 +348,19 @@ void quicksort(INDICE *vector, int left, int right) {
 	int r;
 
 	if (left < right) {
-		//printf("5\n");
 		r = partition(vector, left, right);
-		//printf("6\n");
 		quicksort(vector, left, r-1);
-		//printf("7\n");
 		quicksort(vector, r+1, right);
-		//printf("8\n");
 	}
 }
 
-
+//Função para ordenar o índice
 void ordeneIndice(INDICE *indiceArq, int n){
 
 	quicksort(indiceArq, 0, n-1);
 
 }
-
+//Função para buscar registro no índice
 int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
 
 	int middle = (start + end)/2;
@@ -373,7 +377,7 @@ int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
 	else 
 		return buscaBinaria(indexArq, start, middle -1, key);
 }
-
+//Função para remover no índice
 void removeIndex(INDICE *index, int *n, int pos){
 	int i;
 	
@@ -381,25 +385,67 @@ void removeIndex(INDICE *index, int *n, int pos){
 		index[i] = index[i+1];
 	}
 	(*n)--;
+	index = (INDICE*) realloc(index, sizeof(INDICE) * (*n));
+}
+//Função para carregar o índice do arquivo para memória
+int carregaIndices(FILE *arq1, INDICE **index1, INDICE **index2, INDICE **index3){
 
-	index = (INDICE*) realloc(index, sizeof(INDICE) * (*n) );
+	int cont = 0, offset;
+	char *cnpj = (char*) malloc(sizeof(char) * 19);
+	cnpj[18] = '\0';
+
+	while(fscanf(arq1,"%s %d", cnpj, offset) != EOF){
+			
+		*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (cont+1) );
+		*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (cont+1) );
+		*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (cont+1) );
+		
+		printf("CNPJ: %s.\tOFFSET: %d\n", cnpj, offset);
+
+		(*index1)[cont].cnpj = cnpj;           
+		(*index1)[cont].offset = offset; 
+		(*index2)[cont].cnpj = cnpj;           
+		(*index2)[cont].offset = offset; 
+		(*index3)[cont].cnpj = cnpj;           
+		(*index3)[cont].offset = offset;
+	}
+
+	printf("Arquivos de índice carregados com succeso...");
+
+	free(cnpj);
+	return cont;
+
 }
 
-int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3){
+//Função para gerar índice
+int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 	
 	FILE *arq;
-	int cont = 0, contoffset = 4;
+	int contoffset = 4, offset;
 	char c, *cnpj;
+
+	FILE *arq1 = fopen("index1.txt","r+");
+	*cont = 0;
+
+	if(arq1 != NULL && *index1 == NULL && *index2 == NULL && *index3 == NULL ){
 	
+		printf("Os arquivos de índice já existem.\nCarregando....\n");
+		*cont = carregaIndices(arq1, index1, index2, index3);
+		fclose(arq1);
+		return 1;
+
+	}
 	
 	if(*index1 != NULL || *index2 != NULL || *index3 != NULL ){
-		printf("Arquivo de indice já existente\n");
+		printf("Arquivo de indice já gerado\n");
 		return 0;
 	}
 	
 	arq = fopen("file1.bin", "r");  
+	cnpj = (char*) malloc (sizeof(char) * 19);
+	cnpj[18] = '\0';
 	
-	if(arq!=NULL){														//verifica se o arquivo existe
+	if(arq != NULL){														//verifica se o arquivo existe
 		
 		fseek(arq,4,SEEK_CUR);
 		
@@ -410,9 +456,7 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3){
 			*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (cont+1) );
 			*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (cont+1) );
 			*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (cont+1) );
-			cnpj = (char*) malloc ( sizeof(char) * 19); 
 			fread(cnpj, sizeof(char), 18, arq);
-			cnpj[18] = '\0';
 			(*index1)[cont].cnpj = cnpj;           
 			(*index1)[cont].offset = contoffset; 
 			(*index2)[cont].cnpj = cnpj;           
@@ -436,28 +480,29 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3){
 		ordeneIndice(*index2, cont);
 		ordeneIndice(*index3, cont);
 		
+		free(cnpj);
 		fclose(arq);
 	
 	}else{
-		printf("falha ao arir o arquivo");
+		printf("falha ao abrir o arquivo");
+		return 0;
 	}
-	
-	
-	return cont;
+
+	return 1;
 
 }
 
+//Função para printar o arquivo de índice
 int print_indice(INDICE *index1, int tam){
-	
+
 	int i;
 	
-	for(i=0; i < tam; i++){
-			printf("%s %d\n", index1[i].cnpj, index1[i].offset); 
-	}
+	for(i = 0; i < tam; i++)
+		printf("%s %d\n", index1[i].cnpj, index1[i].offset); 
 	
-	return 0;
+	return 1;
 }
-
+//Função para listar todos os registros removidos
 void listar_removidos(){
 
 	int topo;	
@@ -468,11 +513,11 @@ void listar_removidos(){
 	int aux;
 
 	FILE *fp = fopen("file1.bin","r");
-	if(fp==NULL) {
-		printf("Problemaa");
+	if(fp == NULL) {
+		printf("Falha ao abrir o arquivo");
 		return;
 	}
-	fread(&topo,sizeof(int),1,fp); //lendo o cabecalho
+	fread(&topo,sizeof(int),1,fp); //lendo o registro de cabecalho
 	node = topo;
 
 	printf("Arquivo de indice 1\n");
@@ -487,12 +532,12 @@ void listar_removidos(){
 
 	}
 }
-
-int remove_registro(char * cnpj, INDICE *index1, int *tam ){
+//Função para remover um registro com first fit
+int remove_registro(char * cnpj, INDICE *index1, int *tam){
 	
 	int pos, cont = 0, cabecalho;
 	FILE *arq1;
-	char c = '*';
+	char c = asterisco;
 	
 	pos = buscaBinaria(index1, 0, *tam, cnpj);
 	
@@ -500,50 +545,46 @@ int remove_registro(char * cnpj, INDICE *index1, int *tam ){
 	
 	if (pos == -1){
 		printf("CNPJ não encontrado");
-		return -2;
+		return 0;
 	}
 
 	if(arq1 != NULL){
-		fread(&cabecalho, sizeof(int), 1, arq1);
+		fread(&cabecalho, sizeof(int), 1, arq1);//leu  o registro de cabeçalho
 								
-		printf("%d\n", index1[pos].offset);
 		fseek(arq1, index1[pos].offset , SEEK_SET);						// vai ate offset
 		
 		fwrite(&c, sizeof(char), 1, arq1);								// escreve *
 		
-		while(c != '#'){												// le até #
+		while(c != hashtag){												// le até #
 			cont++;
 			c = fgetc(arq1);
-			printf("%c", c);
 		}
 		
 		fseek(arq1,-cont,SEEK_CUR);										// volta para frente do *
 		
 		cont += 1;														//marca tamanho
 		
-		printf("tamanho %d\n", cont);
-		
 		fwrite(&cont, sizeof(int), 1, arq1);							//escreve o tamanho
 		
-		fwrite(&cabecalho, sizeof(int), 1, arq1);						// escreve cabecalho
+		fwrite(&cabecalho, sizeof(int), 1, arq1);						// escreve o que estava no cabeçalho
 		
 		fseek(arq1, 0, SEEK_SET);										// volta pro cabecalho
-		
-		
+				
 		fwrite(&(index1[pos].offset), sizeof(int), 1, arq1);				// escreve a pos offset
 
-		removeIndex(index1, tam, pos);
+		removeIndex(index1, tam, pos); //remove do arquivo de índice
 	
 		fclose(arq1);
 		
 	}else{
 		printf("falha ao arir o arquivo");
+		return 0;
 	}
 	
-	return 0;
+	return 1;
 }
-
-REGISTRO *cria_registro( int *tam ){
+//Função para criar um novo registro manualmente
+REGISTRO *cria_registro(int *tam ){
 	
 	REGISTRO *myregister = (REGISTRO *)malloc(sizeof(REGISTRO));
 
@@ -580,9 +621,10 @@ REGISTRO *cria_registro( int *tam ){
 	return myregister;
 }
 
+//Função para inserir um registro  novo com first fit
 int insere_registro(FILE *arq, REGISTRO *novo){
 	
-	char separador = '$', separador2 = '#';
+	char separador = cifrao, separador2 = hashtag;
 	int size;
 	
 	fwrite(novo->cnpj, sizeof(char), 18, arq);	
@@ -612,7 +654,7 @@ int insere_registro(FILE *arq, REGISTRO *novo){
 	
 	return 0;
 }
-
+//Função para inserir no índice
 int insereIndice(INDICE *indexArq, int *n, char * cnpj, int offset){
 
 	indexArq = (INDICE *)realloc(indexArq, (sizeof(INDICE)*((*n)+1)));
@@ -628,40 +670,43 @@ int insereIndice(INDICE *indexArq, int *n, char * cnpj, int offset){
 	
 	return 0;
 }
-
+//Função para insrir registro com first-fit
 int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 	
 	FILE *arq1;
 	int offset, node, size, aux, aux2 = -1, anterior;
-	char separador2 = '#';
+	char separador2 = hashtag;
 	
 	arq1 = fopen("file1.bin", "r+");
 	
 	if(arq1 != NULL){
-																		// pega o valor do cabecalho
+																		// pega o valor do cabeçalho
 		fread(&node, sizeof(int), 1, arq1);								// anda nos removidos
 		
 		anterior = node;
 		
 		while(node != -1){
 			
-			fseek(arq1,node + 1,SEEK_SET);								//cursor no começo do arquivo vai até onde o node aponta --- o +1 serve para pular o asterisco
+			fseek(arq1, node + 1, SEEK_SET);								//cursor no começo do arquivo vai até onde o node aponta --- o +1 serve para pular o asterisco
 			fread(&size,sizeof(int),1, arq1);							//nsize vai receber o tamanho do registro removido deste nó
 			fread(&offset,sizeof(int),1, arq1);
 			
 			if(size == regtam){
 				
-				printf("entrou caso igual\n");
+				printf("O registro cabe certinho, não haverá fragmentação\n");
 			
-				fseek(arq1,-9,SEEK_CUR);
-				printf("1\n");								//volta para antes do *
-				insere_registro(arq1, novo);
-				printf("2\n");
-				//insereIndice(index1, tam,  novo->cnpj, anterior);
-				printf("3\n");
-				//ordeneIndice(index1, *tam);
-				printf("4\n");				
-				if(offset != -1){//caso o próximo não for o último da lista, coloca ele como cabeçalho
+				fseek(arq1,-9,SEEK_CUR);//volta para antes do *
+				printf("inserindo no arquivo de dados....\n");
+				insere_registro(arq1, novo);//insere o registro
+				
+				printf("inserindo no índice....\n");
+				insereIndice(index1, tam,  novo->cnpj, anterior);//insere no índice
+
+				printf("ordenando o índice....\n");
+				ordeneIndice(index1, *tam);//ordene o índice
+
+				printf("rearrajando os ponteiros da lista....\n");
+				if(offset != -1){//caso o próximo não for o último da lista, coloca ele no topo da lista
 					fseek(arq1, 0, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
 					fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
 				
@@ -671,36 +716,52 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 				}
 				
 				fclose(arq1);
-				return 0;
 				
 			}
 			else if(size - regtam > 10){	
 				
-				printf("entrou caso maior q 10\n");							
+				printf("O registro cabe mas, haverá fragmentação\n");							
 				
 				fseek(arq1,-8,SEEK_CUR);								// volta para frente do *
 				
 				aux = size - regtam;
 				fwrite(&aux , sizeof(int), 1, arq1);
 				
+				printf("tratando a fragmentação interna...\n");
 				fseek(arq1, 4,SEEK_CUR);								// vai até depois do indicador do prox
 				fseek(arq1, aux-10, SEEK_CUR);							// vai até o tamanho novo menos o tamanho ja percorrido menos o local onde vamos colocar o #
+				fwrite(&separador2 , sizeof(char), 1, arq1);			//escreve o delimitador de registro
 				
-				fwrite(&separador2 , sizeof(char), 1, arq1);
-							
+				printf("inserindo no arquivo de dados....\n");
 				insere_registro(arq1, novo);
+
+				printf("inserindo no índice....\n");
+				insereIndice(index1, tam,  novo->cnpj, anterior + aux);
+
+				printf("ordenando o índice....\n");
+				ordeneIndice(index1, *tam);
 				
-				//precisa tratar o caso da frag ext aqui
-				//insereIndice(index1, tam,  novo->cnpj, anterior + aux);
-				//ordeneIndice(index1, *tam);
+				printf("tratando a fragmentação externa...\n");
+				
+				if(aux < 52){//caso tenha sobrado um tamanho menor do que o tamanho mínimo de um registro, trata como fragmentação externa
+					
+					printf("há fragmentação externa...\n");
+					if(offset != -1){
+						fseek(arq1, 0, SEEK_SET);						// vai até o anterior e pula o * e o tamanho do reg
+						fwrite(&offset , sizeof(int), 1, arq1);					// escreve novo next
+					}else{
+						fseek(arq1, 0, SEEK_SET);
+						fwrite(&aux2 , sizeof(int), 1, arq1);
+					}
+				}
 				
 				fclose(arq1);
-				return 1;
 						
 			}else if(size - regtam <= 10 && size - regtam >= 2){			
 			
 				printf("entrou caso entre 2 e 10\n");
-			
+			/*
+				Acho que não precisa mais desse caso..????
 				fseek(arq1,-8,SEEK_CUR);								// volta para frente do *
 				
 				aux = size - regtam;
@@ -722,33 +783,34 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 				}
 				
 				fclose(arq1);
-				return 1;
+				*/
 			}
 			
-			
-			//printf("Size: %d  Offset :%d  Next :%d\n",size,node,offset);
 			anterior = offset;
 			node = offset;
 			
 		}
-	
+
+		printf("Não coube em nenhum dos registros removidos. Inserindo no final do arquivo de dados....\n");
 		fseek(arq1, 0, SEEK_END);
 		aux = ftell(arq1);
 		insere_registro(arq1, novo);
+
+		printf("inserindo no índice....\n");
 		insereIndice(index1, tam,  novo->cnpj, aux);
+
+		printf("ordenando o índice....\n");
 		ordeneIndice(index1, *tam);
 		fclose(arq1);
 		
-		return 1;
-	
 	}else{
 		printf("falha ao arir o arquivo");
+		return 0;
 	}
-	
-	
-	return 0;
-}
 
+	return 1;
+}
+//Função para listar estatísticas
 int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *index3, int tam3){
 
 	int i, tam;
@@ -768,11 +830,11 @@ int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *inde
 		tam = tam3;
 	}
 	
-	printf("\n\nPara apresentar os registros precione enter para sair pressione q. \n\n");
+	printf("\n\nPara apresentar os registros pressione enter. Para sair pressione q. \n\n");
 	
 	printf("Registros: \t\t indice1 \t\t\t\t\t\t indice 2 \t\t\t\t\t\t indice 3\n\n");
 	
-	for(i=0; i < tam; i++){
+	for(i = 0; i < tam; i++){
 		
 	 
 		printf("%d \t->", i); 
@@ -799,9 +861,39 @@ int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *inde
 		}
 	
 	}
-	
 											
 	return 0;
 }
+//Função para gravar o índice no disco
+int gravaIndice(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *index3, int tam3){
+	
+	int tam = tam1;
+	int i;
+	FILE *arq1, arq2, *arq3;
 
+	if(tam < tam2){
+		tam = tam2;
+	}
+	if(tam < tam3){
+		tam = tam3;
+	}
+
+	arq1 = fopen("index1.txt","w");
+	arq2 = fopen("index2.txt","w");
+	arq3 = fopen("index3.txt","w");
+
+	for(i = 0; i < tam; i++){
+		
+		fprintf(arq1, "%s %d\n", index1[i].cnpj, index1[i].offset);
+		fprintf(arq2, "%s %d\n", index2[i].cnpj, index2[i].offset);
+		fprintf(arq3, "%s %d\n", index3[i].cnpj, index3[i].offset);
+	}
+
+	fclose(arq1);
+	fclose(arq2);	
+	fclose(arq2);
+
+	return 1;	
+
+}
 

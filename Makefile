@@ -1,14 +1,14 @@
 all: 
-	gcc -o T2arquivos Trabmain.c utils.c worst.c -Wall -I. -g
+	gcc -o Trabmain Trabmain.c utils.c worst.c -Wall -I. -g
 
 run: 
-	./T2arquivos
+	./Trabmain
 	
 debug:
-	valgrind --leak-check=full ./T2arquivos
+	valgrind --leak-check=full ./Trabmain
 
 worst: 
-	gcc -o T2arquivos Trabmain.c worst.c utils.c -Wall -I. -g
+	gcc -o Trabmain Trabmain.c worst.c utils.c -Wall -I. -g
 
 clean:
 	rm -f *.bin
