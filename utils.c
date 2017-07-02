@@ -221,8 +221,6 @@ int ler_arquivo_numfixreg(){
 	return 1;
 }
 
-
-
 // recebe um arquivo válido com o cursor já apontado para o proximo registro a ser impresso
 void print_registro(FILE *arq){
 	
@@ -388,31 +386,93 @@ void removeIndex(INDICE *index, int *n, int pos){
 	index = (INDICE*) realloc(index, sizeof(INDICE) * (*n));
 }
 //Função para carregar o índice do arquivo para memória
-int carregaIndices(FILE *arq1, INDICE **index1, INDICE **index2, INDICE **index3){
+int carregaIndices(INDICE **index1, INDICE **index2, INDICE **index3){
 
 	int cont = 0, offset;
-	char *cnpj = (char*) malloc(sizeof(char) * 19);
-	cnpj[18] = '\0';
+	char *cnpj;
+	FILE *arq1, *arq2, *arq3;
 
-	while(fscanf(arq1,"%s %d", cnpj, &offset) != EOF){
-			
-		*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (cont+1) );
-		*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (cont+1) );
-		*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (cont+1) );
+	arq1 = fopen("index1.bin", "r+");
+
+	printf("\nCarregando o arquivo de índice 1...\n");
+
+	while(fgetc(arq1) != EOF){
+
+		fseek(arq1, -1, SEEK_CUR);
+
+		cnpj = (char*) malloc(sizeof(char) * 19);
+		cnpj[18] = '\0';
+
+		fread(cnpj,sizeof(char),18, arq1);
 		
-		printf("CNPJ: %s.\tOFFSET: %d\n", cnpj, offset);
+		fread(&offset,sizeof(int),1, arq1);
+
+		*index1 = (INDICE*) realloc(*index1, sizeof(INDICE) * (cont+1) );
 
 		(*index1)[cont].cnpj = cnpj;           
-		(*index1)[cont].offset = offset; 
-		(*index2)[cont].cnpj = cnpj;           
-		(*index2)[cont].offset = offset; 
-		(*index3)[cont].cnpj = cnpj;           
-		(*index3)[cont].offset = offset;
+		(*index1)[cont].offset = offset;
+
+		cont++;
+
 	}
 
-	printf("Arquivos de índice carregados com succeso...");
+	fclose(arq1);
+	cont = 0;
 
-	free(cnpj);
+	arq2 = fopen("index2.bin", "r+");
+
+	printf("\nCarregando o arquivo de índice 2...\n");
+
+	while(fgetc(arq2) != EOF){
+
+		fseek(arq2, -1, SEEK_CUR);
+
+		cnpj = (char*) malloc(sizeof(char) * 19);
+		cnpj[18] = '\0'; 
+
+		fread(cnpj, sizeof(char), 18, arq2);
+		
+		fread(&offset,sizeof(int),1, arq2);
+
+		*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (cont+1) );
+
+		(*index2)[cont].cnpj = cnpj;           
+		(*index2)[cont].offset = offset;
+
+		cont++;
+
+	}
+
+	fclose(arq2);
+	cont = 0;
+
+	arq3 = fopen("index3.bin", "r+");
+	
+	printf("\nCarregando o arquivo de índice 3...\n");
+
+	while(fgetc(arq3) != EOF){
+
+		fseek(arq3, -1, SEEK_CUR);
+
+		cnpj = (char*) malloc(sizeof(char) * 19);
+		cnpj[18] = '\0';
+
+		fread(cnpj, sizeof(char), 18, arq3);
+		fread(&offset,sizeof(int),1, arq3);
+
+		*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (cont+1) );
+
+		(*index3)[cont].cnpj = cnpj;           
+		(*index3)[cont].offset = offset;
+
+		cont++;
+
+	}
+
+	fclose(arq3);
+
+	printf("Arquivos de índice carregados com succeso...\n");
+
 	return cont;
 
 }
@@ -420,17 +480,18 @@ int carregaIndices(FILE *arq1, INDICE **index1, INDICE **index2, INDICE **index3
 //Função para gerar índice
 int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 	
-	FILE *arq;
+	FILE *arq, *arq1;
 	int contoffset = 4;
-	char c, *cnpj;
+	char c, *cnpj1, *cnpj2, *cnpj3;
 
-	FILE *arq1 = fopen("index1.txt","r+");
 	*cont = 0;
+
+	arq1 = fopen("index1.bin", "r");
 
 	if(arq1 != NULL && *index1 == NULL && *index2 == NULL && *index3 == NULL ){
 	
 		printf("Os arquivos de índice já existem.\nCarregando....\n");
-		*cont = carregaIndices(arq1, index1, index2, index3);
+		*cont = carregaIndices(index1, index2, index3);
 		fclose(arq1);
 		return 1;
 
@@ -442,8 +503,6 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 	}
 	
 	arq = fopen("file1.bin", "r");  
-	cnpj = (char*) malloc (sizeof(char) * 19);
-	cnpj[18] = '\0';
 	
 	if(arq != NULL){														//verifica se o arquivo existe
 		
@@ -456,12 +515,26 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 			*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (*cont+1) );
 			*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (*cont+1) );
 			*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (*cont+1) );
-			fread(cnpj, sizeof(char), 18, arq);
-			(*index1)[*cont].cnpj = cnpj;           
+			
+			cnpj1 = (char*) malloc (sizeof(char) * 19);
+			cnpj1[18] = '\0';
+			
+			cnpj2 = (char*) malloc (sizeof(char) * 19);
+			cnpj2[18] = '\0';
+			
+			cnpj3 = (char*) malloc (sizeof(char) * 19);
+			cnpj3[18] = '\0';
+			
+			fread(cnpj1, sizeof(char), 18, arq);
+			
+			strcpy(cnpj2, cnpj1);
+			strcpy(cnpj3, cnpj1);
+			
+			(*index1)[*cont].cnpj = cnpj1;           
 			(*index1)[*cont].offset = contoffset; 
-			(*index2)[*cont].cnpj = cnpj;           
+			(*index2)[*cont].cnpj = cnpj2;           
 			(*index2)[*cont].offset = contoffset; 
-			(*index3)[*cont].cnpj = cnpj;           
+			(*index3)[*cont].cnpj = cnpj3;           
 			(*index3)[*cont].offset = contoffset;           
 			(*cont)++;	
 			
@@ -480,7 +553,7 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 		ordeneIndice(*index2, *cont);
 		ordeneIndice(*index3, *cont);
 		
-		free(cnpj);
+
 		fclose(arq);
 	
 	}else{
@@ -491,7 +564,6 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 	return 1;
 
 }
-
 //Função para printar o arquivo de índice
 int print_indice(INDICE *index1, int tam){
 
@@ -816,10 +888,9 @@ int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *inde
 	int i, tam;
 	char c;
 	
-	
-	printf("tamanho lista 1: %d\n", tam1);
-	printf("tamanho lista 2: %d\n", tam2);
-	printf("tamanho lista 3: %d\n", tam3);
+	printf("tamanho índíce 1: %d\n", tam1);
+	printf("tamanho índice 2: %d\n", tam2);
+	printf("tamanho índice 3: %d\n", tam3);
 	
 	tam = tam1;
 	
@@ -829,10 +900,15 @@ int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *inde
 	if(tam < tam3){
 		tam = tam3;
 	}
+
+	if(tam <= 0 ){
+		printf("\nIndíce inexistente\n");
+		return 0;
+	}
 	
 	printf("\n\nPara apresentar os registros pressione enter. Para sair pressione q. \n\n");
 	
-	printf("Registros: \t\t indice1 \t\t\t\t\t\t indice 2 \t\t\t\t\t\t indice 3\n\n");
+	printf("Registros: \t\t indice1 \t\t\t\t indice 2 \t\t\t\t indice 3\n\n");
 	
 	for(i = 0; i < tam; i++){
 		
@@ -862,7 +938,7 @@ int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *inde
 	
 	}
 											
-	return 0;
+	return 1;
 }
 //Função para gravar o índice no disco
 int gravaIndice(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *index3, int tam3){
@@ -878,20 +954,25 @@ int gravaIndice(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *inde
 		tam = tam3;
 	}
 
-	arq1 = fopen("index1.txt","w");
-	arq2 = fopen("index2.txt","w");
-	arq3 = fopen("index3.txt","w");
+	arq1 = fopen("index1.bin","w");
+	arq2 = fopen("index2.bin","w");
+	arq3 = fopen("index3.bin","w");
 
 	for(i = 0; i < tam; i++){
 		
-		fprintf(arq1, "%s %d\n", index1[i].cnpj, index1[i].offset);
-		fprintf(arq2, "%s %d\n", index2[i].cnpj, index2[i].offset);
-		fprintf(arq3, "%s %d\n", index3[i].cnpj, index3[i].offset);
+		fwrite(index1[i].cnpj,sizeof(char), 18, arq1);
+		fwrite(&(index1[i].offset),sizeof(int), 1, arq1);
+
+		fwrite(index2[i].cnpj,sizeof(char), 18, arq2);
+		fwrite(&(index2[i].offset),sizeof(int), 1, arq2);
+
+		fwrite(index3[i].cnpj,sizeof(char), 18, arq3);
+		fwrite(&(index3[i].offset),sizeof(int), 1, arq3);
 	}
 
 	fclose(arq1);
 	fclose(arq2);	
-	fclose(arq2);
+	fclose(arq3);
 
 	return 1;	
 

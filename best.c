@@ -163,7 +163,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 	fp = fopen("file2.bin","r+");
 
 	if(fp == NULL){
-		printf("Arquivo inexistente");
+		printf("\nArquivo inexistente\n");
 		return -1;
 	}
 
