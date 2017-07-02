@@ -24,6 +24,7 @@ int main(int argc, char *argv[]){
 	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
 	char *cnpj;
 	REGISTRO *novoreg;
+	int teste;
 
 	while( op1 != 8){															
 		
@@ -58,8 +59,8 @@ int main(int argc, char *argv[]){
 				
 				printf("digite o cnpj\n");
 				cnpj = readline(stdin);
-				remove_registro( cnpj, index1, &tam1 );
-			//	remove_registro_worst( cnpj, index3, &tam1 ); //remoção worst fit
+				remove_registro(cnpj, index1, &tam1);
+				remove_registro_worst(cnpj, index3, &tam3); //remoção worst fit
 				
 				printf("caso4\n");
 				
@@ -67,10 +68,24 @@ int main(int argc, char *argv[]){
 			
 			case 5:
 
-				novoreg = cria_registro(&regtam);
+				//novoreg = cria_registro(&regtam);
 				
+
+
+				printf("digite o cnpj\n");
+				scanf("%d",&teste);
+				novoreg = myRecord(&regtam,teste);
+
+
 				inserir_first(index1, &tam1, regtam, novoreg);
-				//inserir_worst(index3, &tam1, regtam, novoreg);
+				inserir_worst(index3, &tam3, regtam, novoreg);
+
+				
+				printf("index 1\n");
+				print_indice(index1, tam1);
+
+				printf("Index 3\n");
+				print_indice(index3, tam3);
 				
 				printf("caso5\n");
 				
@@ -78,8 +93,6 @@ int main(int argc, char *argv[]){
 			
 			case 6:
 				
-				listar_removidos();
-				//listar_worst_removidos();
 				printf("caso6\n");
 				
 				estatistica(index1, tam1, index2, tam2, index3, tam3);
@@ -87,14 +100,17 @@ int main(int argc, char *argv[]){
 			break;	
 			
 			case 7:
-				
+				printf("-------------Fist Fit--------------");
+				listar_removidos();
+				printf("-------------Worst Fit-------------");
+				listar_worst_removidos();
 				printf("caso7\n");
-				print_indice(index1, tam1);
 				
 			break;	
 			
 			case 8:
 				
+				print_indice(index3, tam1);
 				printf("Finalizando o programa.\n");
 				
 			break;	

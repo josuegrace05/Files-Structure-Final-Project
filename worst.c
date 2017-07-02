@@ -76,7 +76,7 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 	int pos, cont = 0, cabecalho = -1;
 	FILE *arq3;
 	char c = '*';
-	
+
 	pos = buscaBinaria(index3, 0, *tam, cnpj);
 	
 	arq3 = fopen("file3.bin", "r+");	
@@ -108,7 +108,7 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 	
 	fseek(arq3,-cont,SEEK_CUR);										// volta para frente do *
 	
-	cont += 2;														//marca tamanho
+	cont += 1;														//marca tamanho
 	
 	fwrite(&cont, sizeof(int), 1, arq3);							//escreve o tamanho
 	
@@ -166,6 +166,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 	char ast = '*';
 
 	int node, next,topo,nsize;
+	int offset;
 	int diff;
 	fp = fopen("file3.bin","r+");
 
@@ -182,7 +183,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 	fread(&topo,sizeof(int),1,fp);
 	node = topo;
 
-
+	offset = node;
 
 	fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo, + 1 por conta do asterisco
 	fread(&nsize,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
@@ -208,6 +209,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 
 
 		else if (diff < 10){
+			
 			fwrite(&ast, sizeof(char), 1, fp);
 			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 			fwrite(&topo,sizeof(int),1,fp);
@@ -233,10 +235,16 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		}
 
 
+		insereIndice(index3, tam,  novo->cnpj, offset);
+		ordeneIndice(index3, *tam);
+
 	}
 	//insere no final do arquivo
 	else{
 		fseek(fp,0,SEEK_END);
+		offset = ftell(fp);
+		insereIndice(index3, tam,  novo->cnpj, offset);
+		ordeneIndice(index3, *tam);
 		insere_registro(fp,novo);
 
 	}

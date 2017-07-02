@@ -377,8 +377,6 @@ int buscaBinaria(INDICE *indexArq, int start, int end, char *key){
 void removeIndex(INDICE *index, int *n, int pos){
 	int i;
 	
-	free(index[pos].cnpj);
-
 	for(i = pos; i < (*n)-1; i++){
 		index[i] = index[i+1];
 	}
@@ -500,6 +498,11 @@ int remove_registro(char * cnpj, INDICE *index1, int *tam ){
 	
 	arq1 = fopen("file1.bin", "r+");	
 	
+	if (pos == -1){
+		printf("CNPJ não encontrado");
+		return -2;
+	}
+
 	if(arq1 != NULL){
 		fread(&cabecalho, sizeof(int), 1, arq1);
 								
@@ -732,8 +735,8 @@ int inserir_first(INDICE *index1, int *tam, int regtam,  REGISTRO *novo){
 		fseek(arq1, 0, SEEK_END);
 		aux = ftell(arq1);
 		insere_registro(arq1, novo);
-		//insereIndice(index1, tam,  novo->cnpj, aux);
-		//ordeneIndice(index1, *tam);
+		insereIndice(index1, tam,  novo->cnpj, aux);
+		ordeneIndice(index1, *tam);
 		fclose(arq1);
 		
 		return 1;
