@@ -95,7 +95,8 @@ int main(int argc, char *argv[]){
 				
 				printf("Inserindo usando a allocação worst_fit....\n");
 				inserir_worst(index3, &tam3, regtam, novoreg);
-
+				printf("Começou....\n");
+				//inserir_best(index2, &tam2, regtam, novoreg);
 				
 				printf("Quer vizualisar o índice (1) ? (S/N)\n");
 				scanf("%c", &c);
@@ -116,9 +117,11 @@ int main(int argc, char *argv[]){
 			break;	
 			
 			case 7:
-				printf("-------------Fist Fit--------------");
+				printf("-------------Fist Fit--------------\n");
 				listar_removidos();
-				printf("-------------Worst Fit-------------");
+				printf("-------------Best Fit--------------\n");
+				listar_best_removidos();
+				printf("-------------Worst Fit-------------\n");
 				listar_worst_removidos();
 				
 			break;	
