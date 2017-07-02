@@ -150,10 +150,10 @@ int main(int argc, char *argv[]){
 			case 7:
 				printf("-------------Fist Fit--------------\n");
 				listar_removidos();
-				printf("-------------Best Fit--------------\n");
-				listar_best_removidos();
-				printf("-------------Worst Fit-------------\n");
-				listar_worst_removidos();
+				//printf("-------------Best Fit--------------\n");
+				//listar_best_removidos();
+				//printf("-------------Worst Fit-------------\n");
+				//listar_worst_removidos();
 				
 			break;	
 			
@@ -162,6 +162,8 @@ int main(int argc, char *argv[]){
 				printf("\nGravando o índice....\n");
 				if(gravaIndice(index1, tam1, index2, tam2, index3, tam3))
 					printf("\nOperção bem succedida.\n");
+				else
+					printf("\nOperação não bem succedida. Índice inexistente.\n");
 				printf("\nFinalizando o programa.\n");
 				
 			break;	
