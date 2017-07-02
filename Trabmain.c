@@ -38,15 +38,15 @@ int main(int argc, char *argv[]){
 				break;
 
 			case 2:
-				if(listar_registros_numfixreg());//Lista os registros já adicionados
+				if(listar_registros_numfixreg())//Lista os registros já adicionados
 					printf("A operação foi bem succedida\n");
 				else
-					printf("A operação não foi bem succedida\n")
+					printf("A operação não foi bem succedida\n");
 			break;
 
 			case 3:
 				if(criar_indices(&index1, &index2, &index3, &tam1)){//Cria os 3 arquivos de índice
-					printf("A operação foi bem succedida\n")
+					printf("A operação foi bem succedida\n");
 					tam2 = tam1;
 					tam3 = tam2;
 				}
@@ -62,13 +62,21 @@ int main(int argc, char *argv[]){
 				if(remove_registro(cnpj, index1, &tam1))//remoção first_fit
 					printf("A operação foi bem succedida\n");
 				else
-					printf("A operação não foi bem succedida\n", );
+					printf("A operação não foi bem succedida\n");
+
+
+				printf("Removendo usando a allocação best_fit....\n");
+				if(remove_registro_worst(cnpj, index2, &tam2)) //remoção worst fit
+					printf("A operação foi bem succedida\n");
+				else
+					printf("A operação não foi bem succedida\n");	
+
 
 				printf("Removendo usando a allocação worst_fit....\n");
 				if(remove_registro_worst(cnpj, index3, &tam3)) //remoção worst fit
 					printf("A operação foi bem succedida\n");
 				else
-					printf("A operação não foi bem succedida\n", );	
+					printf("A operação não foi bem succedida\n");	
 			break;	
 			
 			case 5://adiciona um novo registro
@@ -84,7 +92,8 @@ int main(int argc, char *argv[]){
 				}
 
 				else if(c == 'N' || c == 'n'){//caso queria gravar de um arquivo
-					ler_arquivo_numfixreg();//Lê do arquivo csv de entrada
+					//ler_arquivo_numfixreg();//Lê do arquivo csv de entrada
+					novoreg = myRecord(&regtam,teste);
 				}
 
 				printf("Inserindo usando a allocação first_fit....\n");
@@ -95,7 +104,10 @@ int main(int argc, char *argv[]){
 				
 				printf("Inserindo usando a allocação worst_fit....\n");
 				inserir_worst(index3, &tam3, regtam, novoreg);
+				
 				printf("Começou....\n");
+				printf("Inserindo usando a allocação best_fit....\n");
+				inserir_worst(index2, &tam2, regtam, novoreg);
 				//inserir_best(index2, &tam2, regtam, novoreg);
 				
 				printf("Quer vizualisar o índice (1) ? (S/N)\n");
@@ -107,6 +119,12 @@ int main(int argc, char *argv[]){
 				scanf("%c", &c);
 				if(c == 'S' || c == 's')
 					print_indice(index3, tam3);
+
+
+				printf("Quer vizualisar o índice (2) ? (S/N)\n");
+				scanf("%c", &c);
+				if(c == 'S' || c == 's')
+					print_indice(index2, tam3);
 
 			break;	
 			

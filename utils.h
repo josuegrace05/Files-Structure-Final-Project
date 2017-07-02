@@ -35,7 +35,7 @@ int toUtf8(char *);
 int ler_arquivo_numfixreg();
 int listar_registros_numfixreg();
 
-int criar_indices(INDICE **, INDICE **, INDICE **, int
+int criar_indices(INDICE **, INDICE **, INDICE **, int *);
 void removeIndex(INDICE *, int *, int);
 int buscaBinaria(INDICE *, int, int, char *);
 

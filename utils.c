@@ -453,17 +453,17 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 			
 			fseek(arq,-1,SEEK_CUR);
 			
-			*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (cont+1) );
-			*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (cont+1) );
-			*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (cont+1) );
+			*index1 = (INDICE*) realloc( *index1, sizeof(INDICE) * (*cont+1) );
+			*index2 = (INDICE*) realloc( *index2, sizeof(INDICE) * (*cont+1) );
+			*index3 = (INDICE*) realloc( *index3, sizeof(INDICE) * (*cont+1) );
 			fread(cnpj, sizeof(char), 18, arq);
-			(*index1)[cont].cnpj = cnpj;           
-			(*index1)[cont].offset = contoffset; 
-			(*index2)[cont].cnpj = cnpj;           
-			(*index2)[cont].offset = contoffset; 
-			(*index3)[cont].cnpj = cnpj;           
-			(*index3)[cont].offset = contoffset;           
-			cont++;	
+			(*index1)[*cont].cnpj = cnpj;           
+			(*index1)[*cont].offset = contoffset; 
+			(*index2)[*cont].cnpj = cnpj;           
+			(*index2)[*cont].offset = contoffset; 
+			(*index3)[*cont].cnpj = cnpj;           
+			(*index3)[*cont].offset = contoffset;           
+			(*cont)++;	
 			
 			contoffset += 18;
 			
@@ -476,9 +476,9 @@ int criar_indices(INDICE **index1, INDICE **index2, INDICE **index3, int *cont){
 			
 		}		
 		
-		ordeneIndice(*index1, cont);
-		ordeneIndice(*index2, cont);
-		ordeneIndice(*index3, cont);
+		ordeneIndice(*index1, *cont);
+		ordeneIndice(*index2, *cont);
+		ordeneIndice(*index3, *cont);
 		
 		free(cnpj);
 		fclose(arq);
@@ -869,7 +869,7 @@ int gravaIndice(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *inde
 	
 	int tam = tam1;
 	int i;
-	FILE *arq1, arq2, *arq3;
+	FILE *arq1, *arq2, *arq3;
 
 	if(tam < tam2){
 		tam = tam2;
