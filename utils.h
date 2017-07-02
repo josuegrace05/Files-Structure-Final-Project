@@ -50,4 +50,7 @@ int insereIndice(INDICE *indexArq, int *n, char * cnpj, int offset);
 
 int inserir_first(INDICE *index1, int *tam, int regtam, REGISTRO *novo);
 
+int estatistica(INDICE *index1, int tam1, INDICE *index2, int tam2, INDICE *index3, int tam3);
+
+
 #endif
