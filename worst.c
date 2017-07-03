@@ -119,7 +119,7 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 	printf("Cabeçalho %d\n",cabecalho);
 	removeIndex(index3, tam, pos);
 	fclose(arq3);
-	return 0;
+	return 1;
 }
 
 
@@ -230,16 +230,16 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		}
 
 
-		insereIndice(index3, tam,  novo->cnpj, offset);
-		ordeneIndice(index3, *tam);
+		//insereIndice(index3, tam,  novo->cnpj, offset);
+		//ordeneIndice(index3, *tam);
 
 	}
 	//insere no final do arquivo
 	else{
 		fseek(fp,0,SEEK_END);
 		offset = ftell(fp);
-		insereIndice(index3, tam,  novo->cnpj, offset);
-		ordeneIndice(index3, *tam);
+		//insereIndice(index3, tam,  novo->cnpj, offset);
+		//ordeneIndice(index3, *tam);
 		insere_registro(fp,novo);
 
 	}
@@ -258,7 +258,7 @@ REGISTRO *myRecord(int *tam, int qual){
 	if (qual == 0) fp = fopen("teste.txt","r"); //
 	if (qual == 1) fp = fopen("teste2.txt","r");
 	if (qual == 2) fp = fopen("teste3.txt","r");
-	if (qual == 4) fp = fopen("teste4.txt","r");
+	if (qual == 3) fp = fopen("teste4.txt","r");
 
 
 	REGISTRO *myregister = (REGISTRO *)malloc(sizeof(REGISTRO));

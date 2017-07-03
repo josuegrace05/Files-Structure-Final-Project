@@ -1,4 +1,5 @@
 #include "worst.h"
+#include "best.h"
 
 //new é o lugar do registro removido, tsize é o tamanho
 void makeBestList(FILE *fp, int new, int *topo, int tsize){
@@ -45,16 +46,17 @@ void makeBestList(FILE *fp, int new, int *topo, int tsize){
 		} // insere o nó
 	}
 
-	// primeira remoção --- funcionando
+	// Se o topo for -1
 	if(node == -1 && nsize == -1){
 		printf("Primeira vez");
 		*topo = new;
+		printf("Topo do Trab = %d\n",*topo);
 		fseek(fp,new + 5,SEEK_SET); //pula para gravar o próximo
 		fwrite(&number,sizeof(int),1,fp); //escreve o -1 no próximo nó
 	}
 
 
-	//insere no final da lista --- funcionando
+	//insere no final da lista
 	else{
 		printf("Final\n");
 		fseek(fp,-4,SEEK_CUR); //volto 4 pq o cursor sai do while depois do ultimo int
@@ -115,7 +117,7 @@ int remove_registro_best(char * cnpj, INDICE *index2, int *tam ){
 	printf("Cabeçalho %d\n",cabecalho);
 	removeIndex(index2, tam, pos);
 	fclose(arq2);
-	return 0;
+	return 1;
 }
 
 
@@ -146,8 +148,8 @@ void listar_best_removidos(){
 		node = aux;
 
 	}
-
 /*
+
 	*/
 }
 
@@ -171,9 +173,10 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 	//inserir no final só quando chegar no -1
 
 
-	fread(&topo,sizeof(int),1,fp);
+	fread(&topo,sizeof(int),1,fp); // pego o tamanho do topo
 
 	node = topo;
+
 
 	while(node!=-1){
 		offset = node;
@@ -191,18 +194,18 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 		// vai acontecer a inserção
 		else {
 			
-			fseek(fp,node,SEEK_SET);
+			fseek(fp,node,SEEK_SET); //vai para o começo do registro
 			insere_registro(fp,novo); //insiro o novo registro no arquivo
 			topo = next; // topo recebe o próximo nó
 
-			//cabe perfeitamente
+			//cabe perfeitamente -- testado e funcionando, apresentou um erro
 			if(diff == 0 ){
 				fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 				fwrite(&topo,sizeof(int),1,fp);
 				fclose(fp);
 				printf("Registrado com Sucesso de modo identico!!");
-				insereIndice(index2, tam,  novo->cnpj, offset);
-				ordeneIndice(index2, *tam);
+				//insereIndice(index2, tam,  novo->cnpj, offset);
+				//ordeneIndice(index2, *tam);
 				return 0;
 			}
 			// testado e funcionando
@@ -213,29 +216,37 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 				fwrite(&topo,sizeof(int),1,fp);
 				fclose(fp);
 				printf("Registrado com Fragmentação externa");
-				insereIndice(index2, tam,  novo->cnpj, offset);
-				ordeneIndice(index2, *tam);
+				//insereIndice(index2, tam,  novo->cnpj, offset);
+				//ordeneIndice(index2, *tam);
 				return 0;
 			}
 			//Problemaa
 			// caso há mais de 10 bytes sobrando 
 			else if (diff < -9){
 				printf("Tratamento de fragmentação!!\n");
-				node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
-				printf("Nessw = %ld!!\n",(int long)node);
+				//node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
 				diff *=-1; // deixando positivo
-				printf("Novo tamanho = %d!!\n",diff);
+				printf("Posição Original = %d  Posição do trab %d Posição do cursor = %ld!!\n",node,node + regtam, ftell(fp));
 				//fseek(fp,1,SEEK_CUR);
+				//printf("Nessw = %ld!!\n",(int long)node);
 				fwrite(&ast, sizeof(char), 1, fp);
 				fwrite(&diff, sizeof(int), 1, fp); //o tamanho desse novo registro é a diferença entre o tamanho original e o novo
 			
-				makeBestList(fp, node, &topo, diff); // vai adicionar esse registro na lista de removidos
+				printf("Topo que foi : %d", topo);
+				// o node está indo no lugar certo para a função de ordenação???????			
+				makeBestList(fp,node + regtam, &topo, diff); // vai adicionar esse registro na lista de removidos
 
+				printf("Topo que voltou : %d", topo);
 				fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 				fwrite(&topo,sizeof(int),1,fp);
+				//fseek(fp,0,SEEK_SET);
+				//fread(&topo,sizeof(int),1,fp);
+
+				//printf("Topo lido do role %d",topo);
 				printf("Inserido!!");
-				insereIndice(index2, tam,  novo->cnpj, offset);
-				ordeneIndice(index2, *tam);
+				//insereIndice(index2, tam,  novo->cnpj, offset);
+				//ordeneIndice(index2, *tam);
+				fclose(fp);
 				return 0;
 			}
 
@@ -251,8 +262,8 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 	fseek(fp,0,SEEK_END);
 	offset = ftell(fp);
 	insere_registro(fp,novo); //insiro o novo registro no arquivo
-	insereIndice(index2, tam,  novo->cnpj, offset);
-	ordeneIndice(index2, *tam);
+	//insereIndice(index2, tam,  novo->cnpj, offset);
+	//ordeneIndice(index2, *tam);
 	fclose(fp);
 
 	return 0;
