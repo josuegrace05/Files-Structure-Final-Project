@@ -36,19 +36,19 @@ int ler_arquivo_numfixreg();
 int listar_registros_numfixreg();
 
 int criar_indices(INDICE **, INDICE **, INDICE **, int *);
-void removeIndex(INDICE *, int *, int);
+void removeIndex(INDICE **, int *, int);
 int buscaBinaria(INDICE *, int, int, char *);
 
-int remove_registro(char *, INDICE *, int *);
+int remove_registro(char *, INDICE **, int *);
 int print_indice(INDICE *, int);
 
 void listar_removidos();
 int insere_registro(FILE *, REGISTRO *);
 
 REGISTRO *cria_registro(int *);
-int insereIndice(INDICE *, int *, char *, int);
+int insereIndice(INDICE **, int *, char *, int);
 
-int inserir_first(INDICE *, int *, int, REGISTRO *);
+int inserir_first(INDICE **, int *, int, REGISTRO *);
 
 int estatistica(INDICE *, int, INDICE *, int, INDICE *, int);
 int gravaIndice(INDICE *, int, INDICE *, int, INDICE *, int);

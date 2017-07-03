@@ -113,7 +113,7 @@ int remove_registro_best(char * cnpj, INDICE *index2, int *tam ){
 	fseek(arq2, 0, SEEK_SET);										// volta pro cabecalho
 	fwrite(&cabecalho, sizeof(int), 1, arq2);				// escreve a pos offset
 	printf("Cabeçalho %d\n",cabecalho);
-	removeIndex(index2, tam, pos);
+	removeIndex(&index2, tam, pos);
 	fclose(arq2);
 	return 0;
 }
@@ -154,7 +154,7 @@ void listar_best_removidos(){
 
 
 
-int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
+int inserir_best(INDICE **index2, int *tam, int regtam,  REGISTRO *novo){
 	FILE *fp;
 	char ast = '*';
 
@@ -202,7 +202,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 				fclose(fp);
 				printf("Registrado com Sucesso de modo identico!!");
 				insereIndice(index2, tam,  novo->cnpj, offset);
-				ordeneIndice(index2, *tam);
+				ordeneIndice(*index2, *tam);
 				return 0;
 			}
 			// testado e funcionando
@@ -214,7 +214,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 				fclose(fp);
 				printf("Registrado com Fragmentação externa");
 				insereIndice(index2, tam,  novo->cnpj, offset);
-				ordeneIndice(index2, *tam);
+				ordeneIndice(*index2, *tam);
 				return 0;
 			}
 			//Problemaa
@@ -235,7 +235,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 				fwrite(&topo,sizeof(int),1,fp);
 				printf("Inserido!!");
 				insereIndice(index2, tam,  novo->cnpj, offset);
-				ordeneIndice(index2, *tam);
+				ordeneIndice(*index2, *tam);
 				return 0;
 			}
 
@@ -252,7 +252,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 	offset = ftell(fp);
 	insere_registro(fp,novo); //insiro o novo registro no arquivo
 	insereIndice(index2, tam,  novo->cnpj, offset);
-	ordeneIndice(index2, *tam);
+	ordeneIndice(*index2, *tam);
 	fclose(fp);
 
 	return 0;

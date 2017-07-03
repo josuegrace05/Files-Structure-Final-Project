@@ -9,7 +9,7 @@
 int remove_registro_worst(char *, INDICE *, int * );
 REGISTRO *myRecord();
 void listar_worst_removidos();
-int inserir_worst(INDICE *, int *, int ,  REGISTRO *);
+int inserir_worst(INDICE **, int *, int ,  REGISTRO *);
 #endif
 
 

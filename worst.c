@@ -117,7 +117,7 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 	fseek(arq3, 0, SEEK_SET);										// volta pro cabecalho
 	fwrite(&cabecalho, sizeof(int), 1, arq3);				// escreve a pos offset
 	printf("Cabeçalho %d\n",cabecalho);
-	removeIndex(index3, tam, pos);
+	removeIndex(&index3, tam, pos);
 	fclose(arq3);
 	return 0;
 }
@@ -160,7 +160,7 @@ void listar_worst_removidos(){
 
 
 //faltando inserir no arquivo de índice
-int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
+int inserir_worst(INDICE **index3, int *tam, int regtam,  REGISTRO *novo){
 	FILE *fp;
 	char ast = '*';
 
@@ -231,7 +231,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 
 
 		insereIndice(index3, tam,  novo->cnpj, offset);
-		ordeneIndice(index3, *tam);
+		ordeneIndice(*index3, *tam);
 
 	}
 	//insere no final do arquivo
@@ -239,7 +239,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		fseek(fp,0,SEEK_END);
 		offset = ftell(fp);
 		insereIndice(index3, tam,  novo->cnpj, offset);
-		ordeneIndice(index3, *tam);
+		ordeneIndice(*index3, *tam);
 		insere_registro(fp,novo);
 
 	}

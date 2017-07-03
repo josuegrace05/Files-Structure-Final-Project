@@ -53,6 +53,9 @@ int main(int argc, char *argv[]){
 				}
 				else
 					printf("\nA operação não foi bem succedida\n"); 
+				
+				print_indice(index1, tam1);
+
 			break;
 				
 			case 4://remove um registro a partir da sua chave primária (cnpj)
@@ -60,7 +63,7 @@ int main(int argc, char *argv[]){
 				cnpj = readline(stdin);
 
 				printf("\nRemovendo usando a allocação first_fit....\n");
-				if(remove_registro(cnpj, index1, &tam1))//remoção first_fit
+				if(remove_registro(cnpj, &index1, &tam1))//remoção first_fit
 					printf("\nA operação foi bem succedida\n");
 				else
 					printf("\nA operação não foi bem succedida\n");
@@ -101,7 +104,7 @@ int main(int argc, char *argv[]){
 				}
 
 				printf("\nInserindo usando a allocação first_fit....\n");
-				if(inserir_first(index1, &tam1, regtam, novoreg))
+				if(inserir_first(&index1, &tam1, regtam, novoreg))
 					printf("\nA operação foi bem succedida\n");
 				else
 					printf("\nA operação não foi bem succedida\n");
