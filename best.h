@@ -6,7 +6,7 @@
 #include <string.h>
 #include "utils.h"
 
-int remove_registro_best(char *, INDICE *, int * );
+int remove_registro_best(char *, INDICE **, int * );
 
 void listar_best_removidos();	
 int inserir_best(INDICE **, int *, int ,  REGISTRO *);

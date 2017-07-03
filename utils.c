@@ -356,7 +356,6 @@ void insertionSort(INDICE *vector, int n){
 
 	int i,j;
     INDICE key;
-    printf("AQUI: %d\n", n);
 
     for (j = 1; j < n; j++) {
 	    key = vector[j];
@@ -398,7 +397,7 @@ void removeIndex(INDICE **index, int *n, int pos){
 	int i;
 	
 	for(i = pos; i < (*n)-1; i++){
-		*(index)[i] = *(index)[i+1];
+		(*index)[i] = (*index)[i+1];
 	}
 	(*n)--;
 	*index = (INDICE*) realloc(*index, sizeof(INDICE) * (*n));
@@ -628,14 +627,13 @@ int remove_registro(char *cnpj, INDICE **index1, int *tam){
 	int pos, cont = 0, cabecalho;
 	FILE *arq1;
 	char c = asterisco;
-	printf("TAM :%d \n", *tam);
+
 	if((*tam) <= 0){
 		printf("\nErro. Arquivo de dados inexistente ou vazio.\n");
 		return 0;
 	}
 	
 	pos = buscaBinaria(*index1, 0, *tam, cnpj);
-	printf("Aqui\n");
 	
 	arq1 = fopen("file1.bin", "r+");	
 	
@@ -657,7 +655,6 @@ int remove_registro(char *cnpj, INDICE **index1, int *tam){
 			c = fgetc(arq1);
 		}
 
-		printf("AQUI 4\n");
 		fseek(arq1,-cont,SEEK_CUR);										// volta para frente do *
 		
 		cont += 1;														//marca tamanho
@@ -669,10 +666,8 @@ int remove_registro(char *cnpj, INDICE **index1, int *tam){
 		fseek(arq1, 0, SEEK_SET);										// volta pro cabecalho
 				
 		fwrite(&((*index1)[pos].offset), sizeof(int), 1, arq1);				// escreve a pos offset
-		printf("AQUI 3\n");
 		removeIndex(index1, tam, pos); //remove do arquivo de índice
-		printf("AQUI 2\n");
-	
+
 		fclose(arq1);
 		
 	}else{
@@ -764,14 +759,12 @@ int insere_registro(FILE *arq, REGISTRO *novo){
 //Função para inserir no índice
 int insereIndice(INDICE **indexArq, int *n, char * cnpj, int offset){
 
-	printf("AQUI 2: %d\n", *n);
-
 	*indexArq = (INDICE *)realloc(*indexArq, sizeof(INDICE)*((*n)+1));
 	
 	if(*indexArq != NULL){
 
-		(*indexArq[*n]).cnpj = cnpj;
-		(*indexArq[*n]).offset = offset;
+		(*indexArq)[*n].cnpj = cnpj;
+		(*indexArq)[*n].offset = offset;
 		(*n)++;
 
 		return 1;	
