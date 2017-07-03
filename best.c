@@ -17,7 +17,7 @@ void makeBestList(FILE *fp, int new, int *topo, int tsize){
 		fread(&nsize,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
 		fread(&naux,sizeof(int),1, fp); // node vai receber a posição do próximo nó na lista
 
-		if(nsize < tsize) {//vai para o próximo
+		if(nsize < tsize) {//vai para o próximo -- ordenação crescente
 			ant = node;
 			node = naux;
 		}
@@ -27,7 +27,7 @@ void makeBestList(FILE *fp, int new, int *topo, int tsize){
 			
 			//caso o novo nó seja inserido na frente da lista, deve haver mudança do topo -- funcionando
 			if(node == *topo){
-				printf("Frente da lista\n");
+				//printf("Frente da lista\n");
 				*topo = new; // new vira o novo topo
 				fseek(fp,new + 5,SEEK_SET); // vou para o ponteiro do próximo nó, do novo nó removido
 				fwrite(&node,sizeof(int),1,fp); //escrevo o offset do próximo nó, que está armazenado no node
@@ -35,7 +35,7 @@ void makeBestList(FILE *fp, int new, int *topo, int tsize){
 			}
 			//caso entre no meio do nó
 			else {
-				printf("No meio \n");
+				//printf("No meio \n");
 				fseek(fp,ant + 5,SEEK_SET); //Vai para o nó anterior, mudar o próximo nó para apontar para o novo
 				fwrite(&new,sizeof(int),1,fp); // faço o nó anterio apontar para o novo nó removido
 
@@ -48,9 +48,9 @@ void makeBestList(FILE *fp, int new, int *topo, int tsize){
 
 	// Se o topo for -1
 	if(node == -1 && nsize == -1){
-		printf("Primeira vez");
+		//printf("Primeira vez");
 		*topo = new;
-		printf("Topo do Trab = %d\n",*topo);
+		//printf("Topo do Trab = %d\n",*topo);
 		fseek(fp,new + 5,SEEK_SET); //pula para gravar o próximo
 		fwrite(&number,sizeof(int),1,fp); //escreve o -1 no próximo nó
 	}
@@ -58,7 +58,7 @@ void makeBestList(FILE *fp, int new, int *topo, int tsize){
 
 	//insere no final da lista
 	else{
-		printf("Final\n");
+		//printf("Final\n");
 		fseek(fp,-4,SEEK_CUR); //volto 4 pq o cursor sai do while depois do ultimo int
 		fwrite(&new,sizeof(int),1,fp); // o ultimo nó recebe como próximo o novo nó a ser inserido
 		
@@ -100,7 +100,7 @@ int remove_registro_best(char * cnpj, INDICE *index2, int *tam ){
 	while(c != '#'){												// le até #
 		cont++;
 		c = fgetc(arq2);
-		printf("%c", c);
+		//printf("%c", c);
 	}
 	
 	fseek(arq2,-cont,SEEK_CUR);										// volta para frente do *
@@ -114,7 +114,7 @@ int remove_registro_best(char * cnpj, INDICE *index2, int *tam ){
 
 	fseek(arq2, 0, SEEK_SET);										// volta pro cabecalho
 	fwrite(&cabecalho, sizeof(int), 1, arq2);				// escreve a pos offset
-	printf("Cabeçalho %d\n",cabecalho);
+	//printf("Cabeçalho %d\n",cabecalho);
 	removeIndex(index2, tam, pos);
 	fclose(arq2);
 	return 1;
@@ -215,7 +215,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 				fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 				fwrite(&topo,sizeof(int),1,fp);
 				fclose(fp);
-				printf("Registrado com Fragmentação externa");
+				printf("Registrado, mas há existẽncia de fragmentação externa");
 				//insereIndice(index2, tam,  novo->cnpj, offset);
 				//ordeneIndice(index2, *tam);
 				return 0;
@@ -226,36 +226,22 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 				printf("Tratamento de fragmentação!!\n");
 				//node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
 				diff *=-1; // deixando positivo
-				printf("Posição Original = %d  Posição do trab %d Posição do cursor = %ld!!\n",node,node + regtam, ftell(fp));
-				//fseek(fp,1,SEEK_CUR);
-				//printf("Nessw = %ld!!\n",(int long)node);
 				fwrite(&ast, sizeof(char), 1, fp);
 				fwrite(&diff, sizeof(int), 1, fp); //o tamanho desse novo registro é a diferença entre o tamanho original e o novo
 			
-				printf("Topo que foi : %d", topo);
 				// o node está indo no lugar certo para a função de ordenação???????			
 				makeBestList(fp,node + regtam, &topo, diff); // vai adicionar esse registro na lista de removidos
 
-				printf("Topo que voltou : %d", topo);
 				fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
 				fwrite(&topo,sizeof(int),1,fp);
-				//fseek(fp,0,SEEK_SET);
-				//fread(&topo,sizeof(int),1,fp);
-
-				//printf("Topo lido do role %d",topo);
+		
 				printf("Inserido!!");
 				//insereIndice(index2, tam,  novo->cnpj, offset);
 				//ordeneIndice(index2, *tam);
 				fclose(fp);
 				return 0;
 			}
-
-
-
 		}
-
-
-
 	}
 
 	//se chegou aqui, insere no final
