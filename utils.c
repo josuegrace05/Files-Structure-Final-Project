@@ -352,10 +352,27 @@ void quicksort(INDICE *vector, int left, int right) {
 	}
 }
 
+void insertionSort(INDICE *vector, int n){
+
+	int i,j;
+    INDICE key;
+    
+    for (j = 1; j < n; j++) {
+	    key = vector[j];
+	    i = j-1;			
+        while (i >= 0 && (strcmp(key.cnpj, vector[i].cnpj) < 0)) {	
+    		vector[i+1] = vector[i];
+    		i--;				
+    	}
+    	vector[i+1] = key;
+    }
+    	
+}
 //Função para ordenar o índice
 void ordeneIndice(INDICE *indiceArq, int n){
 
-	quicksort(indiceArq, 0, n-1);
+	//quicksort(indiceArq, 0, n-1);
+	insertionSort(indiceArq, n);
 
 }
 //Função para buscar registro no índice
