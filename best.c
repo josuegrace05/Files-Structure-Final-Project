@@ -91,7 +91,7 @@ int remove_registro_best(char * cnpj, INDICE *index2, int *tam ){
 
 	fread(&cabecalho, sizeof(int), 1, arq2);
 							
-	printf("%d\n", index2[pos].offset);
+	//printf("%d\n", index2[pos].offset);
 	fseek(arq2, index2[pos].offset , SEEK_SET);						// vai ate offset
 
 	
@@ -162,6 +162,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 
 	int node, next,topo,nsize, offset;
 	int diff;
+
 	fp = fopen("file2.bin","r+");
 
 	if(fp == NULL){
@@ -176,7 +177,7 @@ int inserir_best(INDICE *index2, int *tam, int regtam,  REGISTRO *novo){
 	fread(&topo,sizeof(int),1,fp); // pego o tamanho do topo
 
 	node = topo;
-
+	offset = topo;
 
 	while(node!=-1){
 		offset = node;

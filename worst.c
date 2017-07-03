@@ -28,9 +28,9 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 		// se encontrar o lugar para inserir o nó removido
 		else{
 			
-			//caso o novo nó seja inserido na frente da lista, deve haver mudança do topo -- funcionando
+			//caso o novo nó seja inserido na frente da lista, deve haver mudança do topo 
 			if(node == *topo){
-				printf("Frente da lista\n");
+				//printf("Frente da lista\n");
 				*topo = new; // new vira o novo topo
 				fseek(fp,new + 5,SEEK_SET); // vou para o ponteiro do próximo nó, do novo nó removido
 				fwrite(&node,sizeof(int),1,fp); //escrevo o offset do próximo nó, que está armazenado no node
@@ -38,7 +38,7 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 			}
 			//caso entre no meio do nó
 			else {
-				printf("No meio \n");
+				//printf("No meio \n");
 				fseek(fp,ant + 5,SEEK_SET); //Vai para o nó anterior, mudar o próximo nó para apontar para o novo
 				fwrite(&new,sizeof(int),1,fp); // faço o nó anterio apontar para o novo nó removido
 
@@ -49,18 +49,18 @@ void makeWorstList(FILE *fp, int new, int *topo, int tsize){
 		} // insere o nó
 	}
 
-	// primeira remoção --- funcionando
+	// primeira remoção do arquivo
 	if(node == -1 && nsize == -1){
-		printf("Primeira vez");
+		//printf("Primeira vez");
 		*topo = new;
 		fseek(fp,new + 5,SEEK_SET); //pula para gravar o próximo
 		fwrite(&number,sizeof(int),1,fp); //escreve o -1 no próximo nó
 	}
 
 
-	//insere no final da lista --- funcionando
+	//insere no final da lista
 	else{
-		printf("Final\n");
+		//printf("Final\n");
 		fseek(fp,-4,SEEK_CUR); //volto 4 pq o cursor sai do while depois do ultimo int
 		fwrite(&new,sizeof(int),1,fp); // o ultimo nó recebe como próximo o novo nó a ser inserido
 		
@@ -93,7 +93,7 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 
 	fread(&cabecalho, sizeof(int), 1, arq3);
 							
-	printf("%d\n", index3[pos].offset);
+	//printf("%d\n", index3[pos].offset);
 	fseek(arq3, index3[pos].offset , SEEK_SET);						// vai ate offset
 
 	
@@ -102,7 +102,7 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 	while(c != '#'){												// le até #
 		cont++;
 		c = fgetc(arq3);
-		printf("%c", c);
+		//printf("%c", c);
 	}
 	
 	fseek(arq3,-cont,SEEK_CUR);										// volta para frente do *
@@ -115,8 +115,8 @@ int remove_registro_worst(char * cnpj, INDICE *index3, int *tam ){
 	makeWorstList(arq3,index3[pos].offset,&cabecalho,cont);
 
 	fseek(arq3, 0, SEEK_SET);										// volta pro cabecalho
-	fwrite(&cabecalho, sizeof(int), 1, arq3);				// escreve a pos offset
-	printf("Cabeçalho %d\n",cabecalho);
+	fwrite(&cabecalho, sizeof(int), 1, arq3);				        // escreve a pos offset
+	//printf("Cabeçalho %d\n",cabecalho);
 	removeIndex(index3, tam, pos);
 	fclose(arq3);
 	return 1;
@@ -138,7 +138,7 @@ void listar_worst_removidos(){
 
 	FILE *fp = fopen("file3.bin","r");
 	if(fp==NULL) {
-		printf("Problemaa");
+		printf("Arquivo Inexistente");
 		return;
 	}
 	fread(&topo,sizeof(int),1,fp); //lendo o topo da lista
@@ -159,7 +159,6 @@ void listar_worst_removidos(){
 }
 
 
-//faltando inserir no arquivo de índice
 int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 	FILE *fp;
 	char ast = '*';
@@ -186,7 +185,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 
 	fseek(fp,node + 1,SEEK_SET);//cursor no começo do arquivo, + 1 por conta do asterisco
 	fread(&nsize,sizeof(int),1, fp);//nsize vai receber o tamanho do registro removido deste nó
-	printf("Original : %d Novo : %d",nsize,regtam);
+	//printf("Original : %d Novo : %d",nsize,regtam);
 
 	diff = nsize - regtam;
 	if(diff == 0  || diff > 1) {// Inserção no topo da lista
@@ -196,7 +195,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		insere_registro(fp,novo); //insiro o novo registro no arquivo
 		topo = next; // topo recebe o próximo nó
 		
-		printf("NEW Topo :%d\n", topo);
+		//printf("NEW Topo :%d\n", topo);
 		//coube perfeiramente
 		if (diff == 0) { 
 			fseek(fp,0,SEEK_SET); //volta para o começo do arquivo para salvar o novo topo
@@ -217,8 +216,8 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 		else {
 			printf("Tratamento de fragmentação!!\n");
 			node += regtam; // node vai receber o byte offset do novo registro a ser inserido na lista
-			printf("Nedsw = %ld!!\n",(int long)node);
-			printf("Novo tamanho = %d!!\n",diff);
+			//printf("Nedsw = %ld!!\n",(int long)node);
+			//printf("Novo tamanho = %d!!\n",diff);
 			//fseek(fp,1,SEEK_CUR);
 			fwrite(&ast, sizeof(char), 1, fp);
 			fwrite(&diff, sizeof(int), 1, fp); //o tamanho desse novo registro é a diferença entre o tamanho original e o novo
@@ -229,7 +228,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 			fwrite(&topo,sizeof(int),1,fp);
 		}
 
-
+		//Funções comentadas pq estão apresentando algum erro que somente acontece as vezes e não conseguimos identificar :/
 		//insereIndice(index3, tam,  novo->cnpj, offset);
 		//ordeneIndice(index3, *tam);
 
@@ -248,7 +247,7 @@ int inserir_worst(INDICE *index3, int *tam, int regtam,  REGISTRO *novo){
 	return 0;
 }
 
-
+//função utilizada para facilitar a teste do projeto
 REGISTRO *myRecord(int *tam, int qual){
 	
 	FILE *fp;
