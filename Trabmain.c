@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
 	int op1 = 1, tam1 = 0, tam2 = 0, tam3 = 0, regtam; 
 	INDICE *index1 = NULL, *index2 = NULL, *index3 = NULL;													
 	char *cnpj, c;
-	int teste;
+	//int teste;
 	REGISTRO *novoreg;
 	//int teste;
 
